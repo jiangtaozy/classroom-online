@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 
-class App extends Component {
+class GetUserMediaDemo extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      logs: [],
-    }
   }
 
   componentDidMount() {
@@ -24,7 +21,7 @@ class App extends Component {
     //console.log('navigator.getUserMedia: ' + navigator.getUserMedia)
     navigator.getUserMedia({
       video: true,
-      audio: true,
+      audio: false,
     }, this.onMediaSuccess.bind(this), this.onMediaError)
   }
 
@@ -61,4 +58,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default GetUserMediaDemo;
