@@ -6,7 +6,8 @@ class Chatroom extends Component {
     //console.log('webrtc: ', webrtc)
     //console.log('browserDetails: ', webrtc.browserDetails)
     // WebSocket
-    let webSocket = new WebSocket("ws://localhost:2048")
+    let webSocket = new WebSocket("wss://localhost:2048")
+    //let webSocket = new WebSocket("wss://192.168.0.113:2048")
     webSocket.onopen = function(event) {
       webSocket.send(JSON.stringify({hello: 'world'}))
       console.log('onopen event: ', event)
@@ -112,6 +113,7 @@ class Chatroom extends Component {
           autoPlay
           muted>
         </video>
+        <div>what------------</div>
       </div>
     )
   }

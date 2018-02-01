@@ -18,11 +18,13 @@ func main() {
   flag.Parse()
   hub := NewHub()
   go hub.run()
+  //http.Handle("/", http.FileServer(http.Dir("./client/build")))
   http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
     ServeWs(hub, w, r)
   })
   log.Printf("listen at: %s\n", *port)
-  err := http.ListenAndServe(*port, nil)
+  //err := http.ListenAndServe(*port, nil)
+  err := http.ListenAndServeTLS(*port, "cert.pem", "key.pem", nil)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }
