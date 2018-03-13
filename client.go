@@ -27,10 +27,10 @@ const (
 	maxMessageSize = 8192
 )
 
-var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
-)
+//var (
+	//newline = []byte{'\n'}
+	//space   = []byte{' '}
+//)
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -65,16 +65,20 @@ func (c *Client) readPump() {
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
 			break
 		}
-    log.Printf("message: %s\n", message)
 		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+                message := &Message{
+                  client: c,
+                  msg: msg,
+                }
+		//c.hub.broadcast <- message
+                c.hub.broadcast <- message
 	}
 }
 
@@ -106,11 +110,11 @@ func (c *Client) writePump() {
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
+			//n := len(c.send)
+			//for i := 0; i < n; i++ {
+			//	//w.Write(newline)
+			//	w.Write(<-c.send)
+			//}
 
 			if err := w.Close(); err != nil {
 				return

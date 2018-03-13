@@ -18,8 +18,8 @@ func main() {
   flag.Parse()
   hub := NewHub()
   go hub.run()
-  //http.Handle("/", http.FileServer(http.Dir("./client/build")))
-  http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+  http.Handle("/", http.FileServer(http.Dir("./client/build")))
+  http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
     ServeWs(hub, w, r)
   })
   log.Printf("listen at: %s\n", *port)
