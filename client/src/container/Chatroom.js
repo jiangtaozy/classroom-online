@@ -4,8 +4,8 @@ import webrtc from 'webrtc-adapter'
 class Chatroom extends Component {
   componentDidMount() {
     // WebSocket
-    let webSocket = new WebSocket("wss://192.168.1.101:2048/ws")
-    //let webSocket = new WebSocket("wss://destpact.com:2048/ws")
+    let webSocket = new WebSocket("wss://192.168.1.103:3000/ws")
+    //let webSocket = new WebSocket("wss://destpact.com:3000/ws")
     webSocket.onopen = function(event) {
       console.log('onopen event: ', event)
     }
@@ -15,9 +15,11 @@ class Chatroom extends Component {
     webSocket.onclose = function(event) {
       console.log('onclose event: ', event)
     }
-
+    const configuration = { 
+      "iceServers": [{ "url": "stun:stun.1.google.com:19302" }] 
+    };
     // RTCPeerConnection
-    let pc = new RTCPeerConnection(null)
+    let pc = new RTCPeerConnection(configuration)
     // send any ice candidates to the other peer
     pc.onicecandidate = ({candidate}) => {
       console.log('send ice candidate: ', {candidate})

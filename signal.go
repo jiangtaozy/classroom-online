@@ -12,7 +12,7 @@ import (
   "net/http"
 )
 
-var port = flag.String("port", ":2048", "server listening port")
+var port = flag.String("port", ":3000", "server listening port")
 
 func main() {
   flag.Parse()
