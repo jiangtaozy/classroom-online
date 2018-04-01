@@ -16,8 +16,15 @@ class Chatroom extends Component {
       console.log('onclose event: ', event)
     }
     const configuration = { 
-      "iceServers": [{ "url": "stun:stun.1.google.com:19302" }] 
-    };
+      "iceServers": [
+        {
+          "url": "stun:destpact.com:3478"
+        },
+        {
+          "url": "turn:destpact.com:3479"
+        }
+      ] 
+    }
     // RTCPeerConnection
     let pc = new RTCPeerConnection(configuration)
     // send any ice candidates to the other peer
