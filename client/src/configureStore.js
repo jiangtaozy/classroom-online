@@ -3,22 +3,23 @@
  * create redux store
  */
 
-import { createStore, applyMiddleware } from 'redux'
-import createHistory from 'history/createBrowserHistory'
-import { routerMiddleware } from 'react-router-redux'
+import { createBrowserHistory } from 'history'
+import { applyMiddleware, compose, createStore, } from 'redux'
+import { connectRouter, routerMiddleware } from 'connected-react-router'
 import thunkMiddleware from 'redux-thunk'
 import { createLogger } from 'redux-logger'
 import reducer from './reducer'
 
-export const history = createHistory()
-const historyRouterMiddleware = routerMiddleware(history)
 const loggerMiddleware = createLogger()
 
+export const history = createBrowserHistory()
 export const store = createStore(
-  reducer,
-  applyMiddleware(
-    historyRouterMiddleware,
-    thunkMiddleware,
-    loggerMiddleware
-  )
+  connectRouter(history)(reducer),
+  compose(
+    applyMiddleware(
+      routerMiddleware(history),
+      thunkMiddleware,
+      loggerMiddleware
+    ),
+  ),
 )

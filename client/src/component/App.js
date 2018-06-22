@@ -4,8 +4,8 @@
  */
 
 import React, { Component } from 'react'
-import { ConnectedRouter } from 'react-router-redux'
-import { Route } from 'react-router-dom'
+import { ConnectedRouter } from 'connected-react-router'
+import { Route } from 'react-router'
 import { history } from '../configureStore'
 import Home from './Home'
 import About from './About'
