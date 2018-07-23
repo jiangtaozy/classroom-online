@@ -9,6 +9,9 @@ import { Provider } from 'react-redux'
 import { store } from './configureStore'
 import App from './component/App'
 import registerServiceWorker from './registerServiceWorker'
+import { css } from 'glamor'
+
+css.global('html, body', { margin: 0, padding: 0 })
 
 ReactDOM.render(
   <Provider store={store}>

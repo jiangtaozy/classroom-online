@@ -9,6 +9,7 @@ import { Route } from 'react-router'
 import { history } from '../configureStore'
 import Home from './Home'
 import About from './About'
+import Register from './Register'
 //import Chatroom from './Chatroom'
 
 class App extends Component {
@@ -18,6 +19,7 @@ class App extends Component {
         <div>
           <Route exact path='/' component={Home} />
           <Route path='/about' component={About} />
+          <Route path='/register' component={Register} />
         </div>
       </ConnectedRouter>
     )

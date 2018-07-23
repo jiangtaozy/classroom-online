@@ -4,10 +4,14 @@
  */
 
 import { combineReducers } from 'redux'
-import { routerReducer } from 'react-router-redux'
+
+// test
+const awesome = (state = 0, action) => {
+  return state
+}
 
 const rootReducer = combineReducers({
-  router: routerReducer,
+  awesome,
 })
 
 export default rootReducer

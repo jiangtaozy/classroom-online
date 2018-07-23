@@ -10,7 +10,6 @@ class About extends Component {
   render() {
     return(
       <div>
-        about
         <NavLink
           to='/'>
           home

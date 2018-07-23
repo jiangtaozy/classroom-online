@@ -10,10 +10,13 @@ class Home extends Component {
   render() {
     return(
       <div>
-        home
         <NavLink
           to='/about'>
           about
+        </NavLink>
+        <NavLink
+          to='/register'>
+          注册
         </NavLink>
       </div>
     )

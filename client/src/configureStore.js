@@ -7,10 +7,10 @@ import { createBrowserHistory } from 'history'
 import { applyMiddleware, compose, createStore, } from 'redux'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import thunkMiddleware from 'redux-thunk'
-import { createLogger } from 'redux-logger'
+//import { createLogger } from 'redux-logger'
 import reducer from './reducer'
 
-const loggerMiddleware = createLogger()
+//const loggerMiddleware = createLogger()
 
 export const history = createBrowserHistory()
 export const store = createStore(
@@ -19,7 +19,7 @@ export const store = createStore(
     applyMiddleware(
       routerMiddleware(history),
       thunkMiddleware,
-      loggerMiddleware
+      //loggerMiddleware
     ),
   ),
 )
