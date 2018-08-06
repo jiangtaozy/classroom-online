@@ -10,21 +10,22 @@ import (
   "log"
   "flag"
   "net/http"
+  "github.com/jiangtaozy/classroom-online/signal"
 )
 
 var port = flag.String("port", ":3000", "server listening port")
 
 func main() {
   flag.Parse()
-  hub := NewHub()
-  go hub.run()
+  hub := signal.NewHub()
+  go hub.Run()
   http.Handle("/", http.FileServer(http.Dir("./client/build")))
   http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-    ServeWs(hub, w, r)
+    signal.ServeWs(hub, w, r)
   })
   log.Printf("listen at: %s\n", *port)
   //err := http.ListenAndServe(*port, nil)
-  err := http.ListenAndServeTLS(*port, "cert.pem", "key.pem", nil)
+  err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", nil)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }
