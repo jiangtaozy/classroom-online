@@ -11,11 +11,13 @@ import (
   "flag"
   "net/http"
   "github.com/jiangtaozy/classroom-online/signal"
+  "github.com/jiangtaozy/classroom-online/graphql"
 )
 
 var port = flag.String("port", ":3000", "server listening port")
 
 func main() {
+  graphql.InitDb()
   flag.Parse()
   hub := signal.NewHub()
   go hub.Run()
@@ -23,9 +25,10 @@ func main() {
   http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
     signal.ServeWs(hub, w, r)
   })
+  http.HandleFunc("/graphql", graphql.GraphqlHandle)
   log.Printf("listen at: %s\n", *port)
-  //err := http.ListenAndServe(*port, nil)
-  err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", nil)
+  err := http.ListenAndServe(*port, nil)
+  //err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", nil)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }
