@@ -22,3 +22,9 @@ yarn-error.log*
 
 # vim
 *.swp
+
+# relay generated file
+__generated__
+
+# yarn.lock
+yarn.lock

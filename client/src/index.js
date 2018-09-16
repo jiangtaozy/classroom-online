@@ -5,18 +5,16 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import { store } from './configureStore'
-import App from './component/App'
 import registerServiceWorker from './registerServiceWorker'
 import { css } from 'glamor'
+import Router from './Router'
+import { Resolver } from 'found-relay'
+import environment from './environment'
 
 css.global('html, body', { margin: 0, padding: 0 })
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <Router resolver={new Resolver(environment)} />,
   document.getElementById('root')
 )
 

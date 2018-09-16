@@ -4,20 +4,20 @@
  */
 
 import React, { Component } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link } from 'found'
 
 class Home extends Component {
   render() {
     return(
       <div>
-        <NavLink
+        <Link
           to='/about'>
           about
-        </NavLink>
-        <NavLink
+        </Link>
+        <Link
           to='/register'>
           注册
-        </NavLink>
+        </Link>
       </div>
     )
   }

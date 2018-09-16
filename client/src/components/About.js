@@ -4,16 +4,16 @@
  */
 
 import React, { Component } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link } from 'found'
 
 class About extends Component {
   render() {
     return(
       <div>
-        <NavLink
+        <Link
           to='/'>
           home
-        </NavLink>
+        </Link>
       </div>
     )
   }
