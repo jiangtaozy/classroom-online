@@ -7,22 +7,33 @@ import React, { Component } from 'react'
 import { TextField, Button, Input, InputLabel, InputAdornment,
          FormControl, IconButton } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons' 
-import ReactCountdownClock from 'react-countdown-clock'
 
 class Register extends Component {
   constructor() {
     super()
     this.state = {
       showPassword: false,
-      showCountdown: false,
+      countdown: -1,
     }
   }
 
   handleGetValidationCodeClick = () => {
-    // todo
+    console.log('get code')
     this.setState({
-      showCountdown: true,
+      countdown: 60,
     })
+    const that = this
+    const intervalID = setInterval(function() {
+      const { countdown } = that.state
+      that.setState({
+        countdown: countdown - 1,
+      })
+      if(countdown <= 0) {
+        clearInterval(intervalID)
+      }
+    }, 1000)
+
+    // todo
   }
 
   handleShowPasswordClick = () => {
@@ -38,17 +49,11 @@ class Register extends Component {
 
   handleRegisterClick = () => {
     // todo
-    console.log('click')
-  }
-
-  handleCountdownComplete = () => {
-    this.setState({
-      showCountdown: false,
-    })
+    console.log('register click')
   }
 
   render() {
-    const { showPassword, showCountdown } = this.state
+    const { showPassword, countdown } = this.state
     return(
       <div
         style={{
@@ -78,28 +83,15 @@ class Register extends Component {
             endAdornment={
               <InputAdornment position='end'>
                 { 
-                  showCountdown ?
-                    <div
-                      style={{
-                        marginRight: 8,
-                      }}>
-                      <ReactCountdownClock seconds={180}
-                        size={32}
-                        weight={3}
-                        fontSize={'11px'}
-                        color='rgba(0, 0, 0, 0.54)'
-                        onComplete={this.handleCountdownComplete}
-                      />
-                    </div> :
-                    <Button
-                      size='small'
-                      color='primary'
-                      style={{
-                        width: 90,
-                      }}
-                      onClick={this.handleGetValidationCodeClick}>
-                      获取验证码
-                    </Button>
+                  <Button
+                    size='small'
+                    color='primary'
+                    style={{
+                      whiteSpace: 'nowrap',
+                    }}
+                    onClick={this.handleGetValidationCodeClick}>
+                    { countdown >= 0 ? `${countdown} 秒` : '获取验证码'}
+                  </Button>
                 }
               </InputAdornment>
             }
