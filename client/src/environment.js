@@ -15,7 +15,7 @@ function fetchQuery(
   operation,
   variables,
 ) {
-  return axios.post('http://localhost:3000/graphql', {
+  return axios.post('http://localhost:3001/graphql', {
     query: operation.text,
     variables,
   }).then(response => {

@@ -14,7 +14,7 @@ import (
   "github.com/jiangtaozy/classroom-online/graphql"
 )
 
-var port = flag.String("port", ":3000", "server listening port")
+var port = flag.String("port", ":3001", "server listening port")
 
 func main() {
   graphql.InitDb()
