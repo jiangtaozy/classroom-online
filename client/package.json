@@ -106,6 +106,8 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "graphql": "^14.0.2"
+    "babel-plugin-relay": "^1.6.2",
+    "graphql": "^14.0.2",
+    "relay-compiler": "^1.6.2"
   }
 }
