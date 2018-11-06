@@ -1,0 +1,46 @@
+"""
+  Created by jemo on 2018-10-12 07:42:44.
+"""
+type User {
+  id: ID!
+  name: String
+}
+
+type Result {
+  error: Boolean!
+  message: String
+}
+
+input GetValidationCodeInput {
+  phone: String!
+}
+
+type GetValidationCodePayload {
+  result: Result!
+}
+
+type CreateUserResult {
+  error: Boolean!
+  message: String
+  token: String
+}
+
+input CreateUserInput {
+  phone: String!
+  password: String!
+  code: String!
+}
+
+type CreateUserPayload {
+  createUserResult: CreateUserResult!
+}
+
+type Mutation {
+  getValidationCode(input: GetValidationCodeInput!): GetValidationCodePayload
+  createUser(input: CreateUserInput!): CreateUserPayload
+}
+
+type Query {
+  viewer: User
+}
+

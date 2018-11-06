@@ -10,6 +10,7 @@ import (
   "log"
   "flag"
   "net/http"
+  "github.com/rs/cors"
   "github.com/jiangtaozy/classroom-online/signal"
   "github.com/jiangtaozy/classroom-online/graphql"
 )
@@ -21,13 +22,15 @@ func main() {
   flag.Parse()
   hub := signal.NewHub()
   go hub.Run()
-  http.Handle("/", http.FileServer(http.Dir("./client/build")))
-  http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+  mux := http.NewServeMux()
+  mux.Handle("/", http.FileServer(http.Dir("./client/build")))
+  mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
     signal.ServeWs(hub, w, r)
   })
-  http.HandleFunc("/graphql", graphql.GraphqlHandle)
-  log.Printf("listen at: %s\n", *port)
-  err := http.ListenAndServe(*port, nil)
+  mux.HandleFunc("/graphql", graphql.GraphqlHandle)
+  handler := cors.Default().Handler(mux)
+  log.Printf("listen at %s\n", *port)
+  err := http.ListenAndServe(*port, handler)
   //err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", nil)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)

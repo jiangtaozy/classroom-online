@@ -4,9 +4,17 @@
  */
 
 import React, { Component } from 'react'
-import { TextField, Button, Input, InputLabel, InputAdornment,
-         FormControl, IconButton } from '@material-ui/core'
+import {
+  TextField, Button, Input, InputLabel, InputAdornment,
+  FormControl, IconButton, CircularProgress
+} from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons' 
+import GetValidationCodeMutation from '../mutations/GetValidationCodeMutation'
+import environment from '../environment'
+import Toast from './Toast'
+import CreateUserMutation from '../mutations/CreateUserMutation'
+
+const phoneRegex = /^1[3-9](\d{9})$/
 
 class Register extends Component {
   constructor() {
@@ -14,13 +22,37 @@ class Register extends Component {
     this.state = {
       showPassword: false,
       countdown: -1,
+      showToast: false,
+      toastMessage: '',
+      showLoading: false,
+      phone: '',
+      //phone: 18794769375,
+      validationCode: '',
+      password: '',
+      repeatPassword: '',
     }
   }
 
-  handleGetValidationCodeClick = () => {
-    console.log('get code')
+  // on get validation code completed
+  onGetValidationCodeCompleted = (response, errors) => {
+    const { getValidationCode } = response || {}
+    const { result } = getValidationCode || {}
+    const { error, message } = result || {}
+    if(error || errors) {
+      console.error('RegisterOnGetValidationCodeCompletedError, message: ', message)
+      console.error('errors: ', errors)
+      this.setState({
+        showLoading: false,
+        showToast: true,
+        toastMessage: message || errors.message,
+      })
+      return
+    }
     this.setState({
-      countdown: 60,
+      showLoading: false,
+      showToast: true,
+      toastMessage: message,
+      countdown: 5 * 60,
     })
     const that = this
     const intervalID = setInterval(function() {
@@ -32,10 +64,54 @@ class Register extends Component {
         clearInterval(intervalID)
       }
     }, 1000)
-
-    // todo
+    setTimeout(() => {
+      this.setState({
+        showToast: false,
+      })
+    }, 1000)
   }
 
+  // on get validation code error
+  onGetValidationCodeError = (error) => {
+    if(error) {
+      console.error('RegisterOnGetValidationCodeErrorError: ', error)
+      this.setState({
+        showLoading: false,
+        showToast: true,
+        toastMessage: error.message,
+      })
+    }
+  }
+
+  // get validation code
+  handleGetValidationCodeClick = () => {
+    const { phone } = this.state
+    if(!phone) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请输入手机号',
+      })
+      return
+    }
+    if(!phoneRegex.test(phone)) {
+      this.setState({
+        showToast: true,
+        toastMessage: '手机号格式不正确',
+      })
+      return
+    }
+    this.setState({
+      showLoading: true,
+    })
+    GetValidationCodeMutation.commit(
+      environment,
+      phone.toString(),
+      this.onGetValidationCodeCompleted,
+      this.onGetValidationCodeError,
+    )
+  }
+
+  // show password click
   handleShowPasswordClick = () => {
     const { showPassword } = this.state
     this.setState({
@@ -47,13 +123,136 @@ class Register extends Component {
     event.preventDefault()
   }
 
+  // on register completed
+  onRegisterCompleted = (response, errors) => {
+    console.log('onRegisterCompleted, response: ', response)
+    console.log('errors: ', errors)
+    const { createUser } = response || {}
+    const { createUserResult } = createUser || {}
+    const { error, message, token } = createUserResult || {}
+    if(error || errors) {
+      console.error('OnRegisterCompletedError, message: ', message)
+      console.error('errors: ', errors)
+      this.setState({
+        showLoading: false,
+        showToast: true,
+        toastMessage: message || errors.message,
+      })
+      return
+    }
+    this.setState({
+      showLoading: false,
+      showToast: true,
+      toastMessage: message,
+    })
+    setTimeout(() => {
+      this.setState({
+        showToast: false,
+      })
+    }, 1000)
+  }
+
+  // on register error
+  onRegisterError = (error) => {
+    if(error) {
+      console.error('OnRegisterError, error: ', error)
+      this.setState({
+        showLoading: false,
+        showToast: true,
+        toastMessage: error.message,
+      })
+    }
+  }
+
+  // register click
   handleRegisterClick = () => {
-    // todo
-    console.log('register click')
+    const {
+      phone,
+      validationCode,
+      password,
+      repeatPassword,
+    } = this.state
+    if(!phone) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请输入手机号',
+      })
+      return
+    }
+    if(!phoneRegex.test(phone)) {
+      this.setState({
+        showToast: true,
+        toastMessage: '手机号格式不正确',
+      })
+      return
+    }
+    if(!validationCode) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请输入验证码',
+      })
+      return
+    }
+    if(!password) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请输入密码',
+      })
+      return
+    }
+    if(!repeatPassword) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请输入重复密码',
+      })
+      return
+    }
+    if(password !== repeatPassword) {
+      this.setState({
+        showToast: true,
+        toastMessage: '两次输入的密码不一致',
+      })
+      return
+    }
+    this.setState({
+      showLoading: true,
+    })
+    CreateUserMutation.commit(
+      environment,
+      phone.toString(),
+      password,
+      validationCode,
+      this.onRegisterCompleted,
+      this.onRegisterError,
+    )
+  }
+
+  // close toast
+  closeToast = () => {
+    this.setState({
+      showToast: false,
+    })
+  }
+
+  handleInputChange = (e) => {
+    const { name, value } = e.target
+    this.setState({
+      [name]: value,
+    })
   }
 
   render() {
-    const { showPassword, countdown } = this.state
+    const {
+      showPassword,
+      countdown,
+      showToast,
+      toastMessage,
+      showLoading,
+      phone,
+      validationCode,
+      password,
+      repeatPassword,
+    } = this.state
     return(
       <div
         style={{
@@ -65,7 +264,10 @@ class Register extends Component {
         }}>
         <TextField
           label='手机号'
+          name='phone'
+          value={phone}
           type='number'
+          onChange={this.handleInputChange}
           style={{
             width: 250,
           }}
@@ -79,7 +281,10 @@ class Register extends Component {
           </InputLabel>
           <Input
             id='validationCode'
+            name='validationCode'
+            value={validationCode}
             type='number'
+            onChange={this.handleInputChange}
             endAdornment={
               <InputAdornment position='end'>
                 { 
@@ -89,6 +294,7 @@ class Register extends Component {
                     style={{
                       whiteSpace: 'nowrap',
                     }}
+                    disabled={countdown >= 0}
                     onClick={this.handleGetValidationCodeClick}>
                     { countdown >= 0 ? `${countdown} 秒` : '获取验证码'}
                   </Button>
@@ -106,6 +312,9 @@ class Register extends Component {
           </InputLabel>
           <Input
             id='password'
+            name='password'
+            value={password}
+            onChange={this.handleInputChange}
             type={showPassword ? 'text' : 'password'}
             endAdornment={
               <InputAdornment position='end'>
@@ -127,6 +336,9 @@ class Register extends Component {
           </InputLabel>
           <Input
             id='repeatPassword'
+            name='repeatPassword'
+            value={repeatPassword}
+            onChange={this.handleInputChange}
             type={showPassword ? 'text' : 'password'}
           />
         </FormControl>
@@ -140,6 +352,20 @@ class Register extends Component {
           onClick={this.handleRegisterClick}>
           立即注册
         </Button>
+        <Toast
+          open={showToast}
+          message={toastMessage}
+          onClose={this.closeToast}
+        />
+        { showLoading &&
+          <div
+            style={{
+              position: 'absolute',
+            }}>
+            <CircularProgress
+            />
+          </div>
+        }
       </div>
     )
   }
