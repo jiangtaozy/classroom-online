@@ -1,9 +1,11 @@
 """
-  Created by jemo on 2018-10-12 07:42:44.
+  Maintained by jemo from 2018.10.12 to now
+  Created by jemo on 2018.10.12 07:42:44.
 """
 type User {
   id: ID!
-  name: String
+  token: String
+  nickname: String
 }
 
 type Result {
@@ -35,12 +37,29 @@ type CreateUserPayload {
   createUserResult: CreateUserResult!
 }
 
+type GetTokenResult {
+  error: Boolean!
+  message: String
+  phone: String
+  token: String
+}
+
+input GetTokenInput {
+  phone: String!
+  password: String!
+}
+
+type GetTokenPayload {
+  getTokenResult: GetTokenResult!
+}
+
 type Mutation {
   getValidationCode(input: GetValidationCodeInput!): GetValidationCodePayload
   createUser(input: CreateUserInput!): CreateUserPayload
+  getToken(input: GetTokenInput!): GetTokenPayload
 }
 
 type Query {
-  viewer: User
+  user(token: String): User
 }
 

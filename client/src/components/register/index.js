@@ -1,5 +1,6 @@
 /*
- * Created by jemo on 2018-6-23.
+ * Maintained by jemo from 2018.6.23 to now
+ * Created by jemo on 2018.6.23.
  * Register
  */
 
@@ -9,10 +10,10 @@ import {
   FormControl, IconButton, CircularProgress
 } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons' 
-import GetValidationCodeMutation from '../mutations/GetValidationCodeMutation'
-import environment from '../environment'
-import Toast from './Toast'
-import CreateUserMutation from '../mutations/CreateUserMutation'
+import GetValidationCodeMutation from '../../mutations/GetValidationCodeMutation'
+import environment from '../../environment'
+import Toast from '../toast'
+import CreateUserMutation from '../../mutations/CreateUserMutation'
 
 const phoneRegex = /^1[3-9](\d{9})$/
 
@@ -26,7 +27,6 @@ class Register extends Component {
       toastMessage: '',
       showLoading: false,
       phone: '',
-      //phone: 18794769375,
       validationCode: '',
       password: '',
       repeatPassword: '',
@@ -125,8 +125,8 @@ class Register extends Component {
 
   // on register completed
   onRegisterCompleted = (response, errors) => {
-    console.log('onRegisterCompleted, response: ', response)
-    console.log('errors: ', errors)
+    //console.log('onRegisterCompleted, response: ', response)
+    //console.log('errors: ', errors)
     const { createUser } = response || {}
     const { createUserResult } = createUser || {}
     const { error, message, token } = createUserResult || {}
@@ -136,7 +136,7 @@ class Register extends Component {
       this.setState({
         showLoading: false,
         showToast: true,
-        toastMessage: message || errors.message,
+        toastMessage: message || JSON.stringify(errors),
       })
       return
     }
@@ -362,8 +362,7 @@ class Register extends Component {
             style={{
               position: 'absolute',
             }}>
-            <CircularProgress
-            />
+            <CircularProgress />
           </div>
         }
       </div>

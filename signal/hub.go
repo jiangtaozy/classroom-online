@@ -1,6 +1,10 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+/*
+ * Maintained by jemo from 2018.8.6 to now
+ * Created by jemo on 2018.8.6 22:35:47
+ * Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
+ * Use of this source code is governed by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
 
 package signal
 

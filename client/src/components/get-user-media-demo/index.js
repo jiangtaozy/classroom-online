@@ -1,3 +1,9 @@
+/*
+ * Maintained by jemo from 2018.9.16 to now
+ * Created by jemo on 2018.9.16 11:35:56
+ * get user media demo
+ */
+
 import React, { Component } from 'react';
 
 class GetUserMediaDemo extends Component {

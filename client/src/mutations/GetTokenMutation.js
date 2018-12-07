@@ -1,40 +1,40 @@
 /*
- * Maintained by jemo from 2018.11.1 to now
- * Created by jemo on 2018.11.1 7:25
+ * Created by jemo on 2018.11.13 21:48:03
+ * Maintained by jeme from 2018.11.13 to now
+ * get token mutation
  */
 
 import { graphql, commitMutation } from 'react-relay'
 
 const mutation = graphql`
-  mutation CreateUserMutation($input: CreateUserInput!) {
-    createUser(input: $input) {
-      createUserResult {
+  mutation GetTokenMutation($input: GetTokenInput!) {
+    getToken(input: $input) {
+      getTokenResult {
         error
         message
+        phone
         token
       }
     }
   }
 `
 
-const commit = (
+const commit = ({
   environment,
   phone,
   password,
-  code,
   onCompleted,
   onError,
-) => {
+}) => {
   return commitMutation(
     environment,
     {
       mutation,
       variables: {
         input: {
-          clientMutationId: '222',
+          clientMutationId: '333',
           phone,
           password,
-          code,
         },
       },
       onCompleted,

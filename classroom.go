@@ -1,5 +1,6 @@
 /*
- * Created by jemo on 2018-1-16.
+ * Maintained by jemo from 2018.1.16 to now
+ * Created by jemo on 2018.1.16
  * SDP signaling server.
  * SDP: Session Description Protocol.
  */

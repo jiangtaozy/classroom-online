@@ -1,5 +1,6 @@
 /*
- * Created by jemo on 2018-10-20.
+ * Maintained by jemo from 2018.10.10 to now
+ * Created by jemo on 2018.10.20
  * Toast
  */
 
