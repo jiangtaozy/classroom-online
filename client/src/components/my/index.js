@@ -6,9 +6,11 @@
 
 import React, { Component } from 'react'
 import Typography from '@material-ui/core/Typography'
+import Button from '@material-ui/core/Button'
 import { graphql, QueryRenderer } from 'react-relay'
 import environment from '../../environment'
 import { getLastObject } from '../../indexedDB'
+import EditNicknameModal from './edit-nickname-modal'
 
 class My extends Component {
 
@@ -16,24 +18,40 @@ class My extends Component {
     super(props)
     this.state = {
       token: '',
+      showEditNicknameModal: false,
     }
   }
 
   async componentDidMount() {
     const lastUser = await getLastObject('user')
-    console.log('lastUser: ', lastUser)
+    //console.log('lastUser: ', lastUser)
     const { phone, token } = lastUser || {}
-    console.log('phone: ', phone)
-    console.log('token: ', token)
+    //console.log('phone: ', phone)
+    //console.log('token: ', token)
     this.setState({
       token,
     })
   }
 
+  handleNicknameClick = (event) => {
+    this.setState({
+      showEditNicknameModal: true,
+    })
+  }
+
+  closeEditNicknameModal = () => {
+    this.setState({
+      showEditNicknameModal: false,
+    })
+  }
+
   render() {
-    console.log('this.props: ', this.props)
-    const { token } = this.state
-    console.log('token: ', token)
+    //console.log('this.props: ', this.props)
+    const {
+      token,
+      showEditNicknameModal,
+    } = this.state
+    //console.log('token: ', token)
 
     return (
       <QueryRenderer
@@ -47,8 +65,8 @@ class My extends Component {
         `}
         variables={{token}}
         render={({error, props}) => {
-          console.log('error: ', error)
-          console.log('props: ', props)
+          //console.log('error: ', error)
+          //console.log('props: ', props)
 
           if(error) {
             return <div>error!</div>
@@ -57,7 +75,7 @@ class My extends Component {
             return <div>Loading...</div>
           }
           const { user } = props
-          console.log('user: ', user)
+          //console.log('user: ', user)
           const { nickname } = user || {}
           return (
             <div
@@ -94,16 +112,17 @@ class My extends Component {
                   src='/icon/avatar-8a-128.svg'
                   alt='头像'
                 />
-                <div
+                <Button
                   style={{
                     fontSize: 16,
                     padding: 12,
                     fontWeight: 'bold',
                     color: 'white',
                     textShadow: '1px 1px 1px black',
-                  }}>
+                  }}
+                  onClick={this.handleNicknameClick}>
                   {nickname || '点击编辑昵称'}
-                </div>
+                </Button>
               </div>
               {/* 简介 */}
               <Typography
@@ -113,6 +132,12 @@ class My extends Component {
                 }}>
                 兰州理工大学材料工程专业研究生
               </Typography>
+              {/* 编辑昵称 Modal */}
+              <EditNicknameModal
+                open={showEditNicknameModal}
+                onClose={this.closeEditNicknameModal}
+                nickname={nickname || ''}
+              />
             </div>
           )
         }}

@@ -57,6 +57,12 @@ class NavigationBar extends Component {
               to='/school'>
               我的学校
             </NavLink>
+            <NavLink
+              style={linkStyle}
+              activeStyle={activeLinkStyle}
+              to='/login'>
+              登录
+            </NavLink>
           </div>
         </MediaQuery>
         {/* pc or laptop 台式电脑或笔记本 */}
@@ -85,6 +91,12 @@ class NavigationBar extends Component {
               activeStyle={activeLinkStyle}
               to='/school'>
               我的学校
+            </NavLink>
+            <NavLink
+              style={linkStyle}
+              activeStyle={activeLinkStyle}
+              to='/login'>
+              登录
             </NavLink>
           </div>
         </MediaQuery>

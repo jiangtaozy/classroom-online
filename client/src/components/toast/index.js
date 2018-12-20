@@ -6,38 +6,35 @@
 
 import React, { Component } from 'react'
 import {
-  Dialog,
-  //Slide,
-  DialogContent,
-  DialogContentText
+  Modal,
 } from '@material-ui/core'
-
-/*
-function Transition(props) {
-  return <Slide direction="right" {...props} />
-}
-*/
 
 class Toast extends Component {
 
   render() {
-    const { open, message, onClose } = this.props
+    const {
+      open,
+      message,
+      onClose,
+    } = this.props
     return (
-      <Dialog
+      <Modal
         open={open}
-        //TransitionComponent={Transition}
-        keepMounted
         onClose={onClose}
-      >
-        <DialogContent
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <div
           style={{
             padding: 10,
+            backgroundColor: 'white',
+            outline: 'none',
           }}>
-          <DialogContentText>
-            {message}
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+          {message}
+        </div>
+      </Modal>
     )
   }
 }
