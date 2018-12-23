@@ -5,3 +5,10 @@
 
 # pem
 pem
+
+# bin
+classroom-online
+
+# go module
+go.mod
+go.sum

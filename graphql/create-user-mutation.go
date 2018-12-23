@@ -86,9 +86,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
       default:
         log.Fatalf("bad cluster endpoints, which are not etcd servers: %v", err)
       }
-      if clientv3.IsConnCanceled(err) {
-        log.Fatalf("clientv3 >= v3.4, gRPC client connection is closed: %v", err)
-      }
     }
     if len(resp.Kvs) == 0 {
       log.Println("验证码为空")

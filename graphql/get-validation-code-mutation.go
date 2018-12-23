@@ -75,9 +75,6 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
       default:
         log.Fatalf("bad cluster endpoints, which are not etcd servers: %v", err)
       }
-      if clientv3.IsConnCanceled(err) {
-        log.Fatalf("clientv3 >= v3.4, gRPC client connection is closed: %v", err)
-      }
     }
     if len(resp.Kvs) > 0 {
       log.Println("验证码已发送过")
@@ -88,10 +85,7 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
     }
     dysms.HTTPDebugEnable = true
     dysms.SetACLClient(alismsAccessKeyId, alismsAccessKeySecret)
-    uid, uuidErr := uuid.NewV4()
-    if uuidErr != nil {
-      log.Println("uuidNewV4Error: ", uuidErr)
-    }
+    uid := uuid.NewV4()
     log.Println("uid: ", uid)
     randomNumber := rand.Intn(10000)
     log.Println("randomNumber: ", randomNumber)
