@@ -14,6 +14,10 @@ import School from '../school'
 
 class Home extends Component {
   render() {
+    const {
+      user,
+      token,
+    } = this.props
     return(
       <div>
         {/* pc 导航栏 */}
@@ -22,7 +26,13 @@ class Home extends Component {
         </MediaQuery>
         <Route
           path='/my'
-          component={My}
+          render={() => {
+            return (
+              <My
+                user={user}
+                token={token}/>
+            )
+          }}
         />
         <Route
           path='/classroom'

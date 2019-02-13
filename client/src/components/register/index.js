@@ -125,11 +125,12 @@ class Register extends Component {
 
   // on register completed
   onRegisterCompleted = (response, errors) => {
-    //console.log('onRegisterCompleted, response: ', response)
-    //console.log('errors: ', errors)
     const { createUser } = response || {}
     const { createUserResult } = createUser || {}
-    const { error, message, token } = createUserResult || {}
+    const {
+      error,
+      message,
+    } = createUserResult || {}
     if(error || errors) {
       console.error('OnRegisterCompletedError, message: ', message)
       console.error('errors: ', errors)

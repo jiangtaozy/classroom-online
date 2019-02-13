@@ -19,7 +19,7 @@ import (
 var port = flag.String("port", ":3001", "server listening port")
 
 func main() {
-  graphql.InitDb()
+  graphql.Init()
   flag.Parse()
   hub := signal.NewHub()
   go hub.Run()

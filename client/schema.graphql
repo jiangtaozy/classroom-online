@@ -2,7 +2,7 @@
   Maintained by jemo from 2018.10.12 to now
   Created by jemo on 2018.10.12 07:42:44.
 """
-type User {
+type User implements Node {
   id: ID!
   token: String
   nickname: String
@@ -13,6 +13,9 @@ type Result {
   message: String
 }
 
+"""
+  get validation code mutation
+"""
 input GetValidationCodeInput {
   phone: String!
 }
@@ -21,6 +24,9 @@ type GetValidationCodePayload {
   result: Result!
 }
 
+"""
+  create user mutation
+"""
 type CreateUserResult {
   error: Boolean!
   message: String
@@ -37,6 +43,9 @@ type CreateUserPayload {
   createUserResult: CreateUserResult!
 }
 
+"""
+  get token mutation
+"""
 type GetTokenResult {
   error: Boolean!
   message: String
@@ -53,13 +62,41 @@ type GetTokenPayload {
   getTokenResult: GetTokenResult!
 }
 
+"""
+  update user mutation
+"""
+
+input UpdateUserInput {
+  token: String!
+  nickname: String
+  clientMutationId: String
+}
+
+type UpdateUserPayload {
+  user: User
+  clientMutationId: String
+}
+
+"""
+  mutation
+"""
 type Mutation {
   getValidationCode(input: GetValidationCodeInput!): GetValidationCodePayload
   createUser(input: CreateUserInput!): CreateUserPayload
   getToken(input: GetTokenInput!): GetTokenPayload
+  updateUser(input: UpdateUserInput!): UpdateUserPayload
 }
 
+"""
+  query
+"""
 type Query {
   user(token: String): User
+  node(
+    id: ID!
+  ): Node
 }
 
+interface Node {
+  id: ID!
+}
