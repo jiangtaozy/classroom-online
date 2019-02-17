@@ -7,15 +7,15 @@
 package graphql
 
 import (
+  "io"
+  "os"
   "log"
-  "fmt"
   "time"
   "strings"
   "net/http"
   "io/ioutil"
   "encoding/json"
   "golang.org/x/net/context"
-  "github.com/dgrijalva/jwt-go"
   "github.com/graphql-go/relay"
   "github.com/graphql-go/graphql"
   "github.com/dancannon/gorethink"
@@ -40,6 +40,7 @@ type User struct {
   Phone string `json:"phone" gorethink:"phone"`
   Password string `json:"password" gorethink:"password"`
   Nickname string `json:"nickname" gorethink:"nickname"`
+  Avatar string `json:"avatar" gorethink:"avatar"`
 }
 type PostData struct {
   Query string `json:"query"`
@@ -94,6 +95,9 @@ func Init() {
       "nickname": &graphql.Field{
         Type: graphql.String,
       },
+      "avatar": &graphql.Field{
+        Type: graphql.String,
+      },
     },
     Interfaces: []*graphql.Interface{
       nodeDefinitions.NodeInterface,
@@ -130,28 +134,7 @@ func Init() {
         }, nil
       }
       nickname := inputMap["nickname"]
-      token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-          return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-        }
-        return hmacSecret, nil
-      })
-      if err != nil {
-        log.Println("updateUserMutationJwtParseError, error: ", err)
-        return map[string]interface{} {
-          "error": true,
-          "message": "token parse error!",
-        }, nil
-      }
-      claims, ok := token.Claims.(jwt.MapClaims);
-      if  !ok || !token.Valid {
-        log.Println("updateUserMutationTokenClaimsError, not ok or token invalid")
-        return map[string]interface{} {
-          "error": true,
-          "message": "token claim error!",
-        }, nil
-      }
-      id := claims["id"]
+      id := GetUserIdFromToken(tokenString)
       var user = map[string]interface{}{
         "nickname": nickname,
       }
@@ -175,6 +158,53 @@ func Init() {
       }, nil
     },
   })
+  updateAvatarMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+    Name: "UpdateAvatar",
+    InputFields: graphql.InputObjectConfigFieldMap{
+      "token": &graphql.InputObjectFieldConfig{
+        Type: graphql.NewNonNull(graphql.String),
+      },
+      "filename": &graphql.InputObjectFieldConfig{
+        Type: graphql.NewNonNull(graphql.String),
+      },
+    },
+    OutputFields: graphql.Fields{
+      "user": &graphql.Field{
+        Type: userType,
+        Description: "user info",
+        Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+          if payload, ok := params.Source.(map[string]interface{}); ok {
+            return GetUser(payload["id"].(string)), nil
+          }
+          return nil, nil
+        },
+      },
+    },
+    MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+      tokenString, ok := inputMap["token"].(string)
+      filename, ok := inputMap["filename"].(string)
+      if !ok {
+        log.Println("updateAvatarMutationInputMapError")
+        return nil, nil
+      }
+      id := GetUserIdFromToken(tokenString)
+      var user = map[string]interface{}{
+        "avatar": filename,
+      }
+      updateResponse, err := gorethink.Table("user").Get(id).Update(user).RunWrite(session)
+      if err != nil {
+        log.Println("updateAvatarMutationUpdateError, error: ", err)
+        return nil, nil
+      }
+      if updateResponse.Errors != 0 {
+        log.Printf("updateAvatarMutationUpdateResponseError, updateResponse: %+v\n", updateResponse)
+        return nil, nil
+      }
+      return map[string]interface{} {
+        "id": id,
+      }, nil
+    },
+  })
   rootMutation := graphql.NewObject(graphql.ObjectConfig{
     Name: "Mutation",
     Fields: graphql.Fields{
@@ -182,6 +212,7 @@ func Init() {
       "createUser": createUserMutation,
       "getToken": getTokenMutation,
       "updateUser": updateUserMutation,
+      "updateAvatar": updateAvatarMutation,
     },
   })
   rootQuery := graphql.NewObject(graphql.ObjectConfig{
@@ -200,22 +231,7 @@ func Init() {
           if !ok || tokenString == "" {
             return User{}, nil
           }
-          token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-            if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-              return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-            }
-            return hmacSecret, nil
-          })
-          if err != nil {
-            log.Println("userQueryJwtParseError, error: ", err)
-            return User{}, nil
-          }
-          claims, ok := token.Claims.(jwt.MapClaims);
-          if  !ok || !token.Valid {
-            log.Println("userQueryTokenClaimsError, not ok or token invalid")
-            return User{}, nil
-          }
-          id := claims["id"].(string)
+          id := GetUserIdFromToken(tokenString)
           return GetUser(id), nil
         },
       },
@@ -246,12 +262,39 @@ func Init() {
 }
 
 func GraphqlHandle(w http.ResponseWriter, r *http.Request) {
-  decoder := json.NewDecoder(r.Body)
+  contentType := r.Header.Get("Content-Type")
+  contentTypeKey := strings.Split(contentType, ";")[0]
   var data PostData
-  err := decoder.Decode(&data)
-  if err != nil {
-    log.Println("GraphqlHandleDecodeError, err: ", err)
-    panic(err)
+  if(contentTypeKey == "application/json") {
+    decoder := json.NewDecoder(r.Body)
+    err := decoder.Decode(&data)
+    if err != nil {
+      log.Println("GraphqlHandleDecodeError, err: ", err)
+      panic(err)
+    }
+  } else {
+    r.ParseMultipartForm(32 << 20) // 32M
+    multipartForm := r.MultipartForm
+    data.Query = multipartForm.Value["query"][0]
+    var variables map[string]interface {}
+    err := json.Unmarshal([]byte(multipartForm.Value["variables"][0]), &variables)
+    if err != nil {
+      log.Println("GraphqlHandleJsonUnmarshalError: ", err)
+    }
+    data.Variables = variables
+    file, handler, err := r.FormFile("file")
+    if err != nil {
+      log.Println("GraphqlHandlerGetFileError: ", err)
+    }
+    defer file.Close()
+    input := data.Variables["input"].(map[string]interface{})
+    input["filename"] = handler.Filename
+    f, err := os.OpenFile("./public/" + handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+    if err != nil {
+      log.Println("GraphqlHandlerOpenFileError: ", err)
+    }
+    defer f.Close()
+    io.Copy(f, file)
   }
   res := graphql.Do(graphql.Params{
     Schema: schema,

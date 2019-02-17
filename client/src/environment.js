@@ -15,11 +15,34 @@ import axios from 'axios'
 function fetchQuery(
   operation,
   variables,
+  cacheConfig,
+  uploadables,
 ) {
-  return axios.post('http://192.168.1.106:3001/graphql', {
-    query: operation.text,
-    variables,
-  }).then(response => {
+  let request
+  if(uploadables) {
+    if(!window.FormData) {
+      throw new Error('Uploading files without `FormData` not supported.')
+    }
+    const formData = new FormData()
+    formData.append('query', operation.text)
+    formData.append('variables', JSON.stringify(variables))
+    Object.keys(uploadables).forEach(key => {
+      if(Object.prototype.hasOwnProperty.call(uploadables, key)) {
+        formData.append(key, uploadables[key])
+      }
+    })
+    request = formData
+  } else {
+    request = {
+      query: operation.text,
+      variables,
+    }
+  }
+  return axios.post(
+    //'http://127.0.0.1:3001/graphql',
+    'http://192.168.1.106:4000/graphql',
+    request
+  ).then(response => {
     return response.data
   })
 }

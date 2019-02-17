@@ -6,6 +6,7 @@ type User implements Node {
   id: ID!
   token: String
   nickname: String
+  avatar: String
 }
 
 type Result {
@@ -78,13 +79,29 @@ type UpdateUserPayload {
 }
 
 """
+  update avatar mutation
+"""
+
+input UpdateAvatarInput {
+  token: String!
+  clientMutationId: String
+}
+
+type UpdateAvatarPayload {
+  user: User
+  clientMutationId: String
+}
+
+"""
   mutation
 """
+
 type Mutation {
   getValidationCode(input: GetValidationCodeInput!): GetValidationCodePayload
   createUser(input: CreateUserInput!): CreateUserPayload
   getToken(input: GetTokenInput!): GetTokenPayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
+  updateAvatar(input: UpdateAvatarInput!): UpdateAvatarPayload
 }
 
 """

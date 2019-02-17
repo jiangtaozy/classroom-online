@@ -25,6 +25,7 @@ func main() {
   go hub.Run()
   mux := http.NewServeMux()
   mux.Handle("/", http.FileServer(http.Dir("./client/build")))
+  mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
   mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
     signal.ServeWs(hub, w, r)
   })

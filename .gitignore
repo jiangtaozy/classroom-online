@@ -12,3 +12,9 @@ classroom-online
 # go module
 go.mod
 go.sum
+
+# public
+public
+
+# gin
+gin-bin

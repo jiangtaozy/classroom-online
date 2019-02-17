@@ -9,6 +9,9 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import { graphql, createFragmentContainer } from 'react-relay'
 import EditNicknameModal from './edit-nickname-modal'
+import Dropzone from 'react-dropzone'
+import UpdateAvatarMutation from '../../mutations/UpdateAvatarMutation'
+import Toast from '../toast'
 
 class My extends Component {
 
@@ -16,6 +19,8 @@ class My extends Component {
     super(props)
     this.state = {
       showEditNicknameModal: false,
+      showToast: false,
+      toastMessage: '',
     }
   }
 
@@ -31,16 +36,78 @@ class My extends Component {
     })
   }
 
+  onAvatarSelected = (acceptedFiles, rejectedFiles) => {
+    const {
+      user,
+      token,
+      relay,
+    } = this.props
+    if(!token) {
+      this.setState({
+        showToast: true,
+        toastMessage: '请先登录',
+      })
+      return
+    }
+    UpdateAvatarMutation.commit({
+      environment: relay.environment,
+      file: acceptedFiles[0],
+      clientMutationId: user.id,
+      token,
+      onCompleted: this.onUpdateAvatarCompleted,
+      onError: this.onUpdateAvatarError,
+    })
+  }
+
+  onUpdateAvatarCompleted = (response, errors) => {
+    if(errors) {
+      console.error('onUpdateAvatarCompletedError: ', errors)
+      this.setState({
+        showToast: true,
+        toastMessage: JSON.stringify(errors),
+      })
+      return
+    }
+    this.setState({
+      showToast: true,
+      toastMessage: '修改成功',
+    })
+    setTimeout(() => {
+      this.setState({
+        showToast: false,
+      })
+    }, 1000)
+  }
+
+  onUpdateAvatarError = (error) => {
+    console.error('onUpdateAvatarError: ', error)
+    this.setState({
+      showToast: true,
+      toastMessage: JSON.stringify(error),
+    })
+  }
+
+  closeToast = () => {
+    this.setState({
+      showToast: false,
+    })
+  }
+
   render() {
     const {
       showEditNicknameModal,
+      showToast,
+      toastMessage,
     } = this.state
     const {
       user,
       token,
       relay,
     } = this.props
-    const { nickname } = user || {}
+    const {
+      nickname,
+      avatar,
+    } = user || {}
     return (
       <div
         style={{
@@ -64,18 +131,30 @@ class My extends Component {
             display: 'flex',
             alignItems: 'center',
           }}>
-          <img
-            style={{
-              width: 100,
-              height: 100,
-              objectFit: 'cover',
-              marginLeft: 12,
-              borderRadius: 5,
-              boxShadow: '-1px -1px 1px 0 white, 1px 1px 1px 0 white',
+          <Dropzone
+            onDrop={this.onAvatarSelected}>
+            {({getRootProps, getInputProps}) => {
+              return (
+                <div
+                  {...getRootProps()}>
+                  <input
+                    {...getInputProps()} />
+                  <img
+                    style={{
+                      width: 100,
+                      height: 100,
+                      objectFit: 'cover',
+                      marginLeft: 12,
+                      borderRadius: 5,
+                      boxShadow: '-1px -1px 1px 0 white, 1px 1px 1px 0 white',
+                    }}
+                    src={`http://localhost:3001/static/${avatar}` || '/icon/avatar-8a-128.svg'}
+                    alt='头像'
+                  />
+                </div>
+              )
             }}
-            src='/icon/avatar-8a-128.svg'
-            alt='头像'
-          />
+          </Dropzone>
           <Button
             style={{
               fontSize: 16,
@@ -104,6 +183,11 @@ class My extends Component {
           token={token}
           relay={relay}
         />
+        <Toast
+          open={showToast}
+          message={toastMessage}
+          onClose={this.closeToast}
+        />
       </div>
     )
   }
@@ -112,8 +196,9 @@ class My extends Component {
 export default createFragmentContainer(My, {
   user: graphql`
     fragment my_user on User {
+      id,
+      avatar,
       nickname,
-      id
     }
   `,
 })
