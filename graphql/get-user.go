@@ -20,5 +20,6 @@ func GetUser(id string) User {
   var user User
   cursor.One(&user)
   cursor.Close()
+  user.Avatar = staticFilePath + user.Avatar
   return user
 }

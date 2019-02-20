@@ -8,9 +8,9 @@ import React, { Component } from 'react'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import { graphql, createFragmentContainer } from 'react-relay'
-import EditNicknameModal from './edit-nickname-modal'
+import EditModal from './edit-modal'
 import Dropzone from 'react-dropzone'
-import UpdateAvatarMutation from '../../mutations/UpdateAvatarMutation'
+import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 import Toast from '../toast'
 
 class My extends Component {
@@ -18,21 +18,23 @@ class My extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      showEditNicknameModal: false,
+      showEditModal: false,
       showToast: false,
       toastMessage: '',
+      textName: 'nickname',
     }
   }
 
-  handleNicknameClick = (event) => {
+  handleTextClick = ({textName}) => {
     this.setState({
-      showEditNicknameModal: true,
+      showEditModal: true,
+      textName,
     })
   }
 
-  closeEditNicknameModal = () => {
+  closeEditModal = () => {
     this.setState({
-      showEditNicknameModal: false,
+      showEditModal: false,
     })
   }
 
@@ -49,9 +51,10 @@ class My extends Component {
       })
       return
     }
-    UpdateAvatarMutation.commit({
+    UpdateUserMutation.commit({
       environment: relay.environment,
       file: acceptedFiles[0],
+      filekey: 'avatar',
       clientMutationId: user.id,
       token,
       onCompleted: this.onUpdateAvatarCompleted,
@@ -95,9 +98,10 @@ class My extends Component {
 
   render() {
     const {
-      showEditNicknameModal,
+      showEditModal,
       showToast,
       toastMessage,
+      textName,
     } = this.state
     const {
       user,
@@ -107,6 +111,7 @@ class My extends Component {
     const {
       nickname,
       avatar,
+      introduction,
     } = user || {}
     return (
       <div
@@ -148,7 +153,7 @@ class My extends Component {
                       borderRadius: 5,
                       boxShadow: '-1px -1px 1px 0 white, 1px 1px 1px 0 white',
                     }}
-                    src={`http://localhost:3001/static/${avatar}` || '/icon/avatar-8a-128.svg'}
+                    src={avatar || '/icon/avatar-8a-128.svg'}
                     alt='头像'
                   />
                 </div>
@@ -163,7 +168,9 @@ class My extends Component {
               color: 'white',
               textShadow: '1px 1px 1px black',
             }}
-            onClick={this.handleNicknameClick}>
+            onClick={() => this.handleTextClick({
+              textName: 'nickname',
+            })}>
             {nickname || '点击编辑昵称'}
           </Button>
         </div>
@@ -173,15 +180,21 @@ class My extends Component {
           style={{
             padding: 12,
           }}>
-          兰州理工大学材料工程专业研究生
+          <Button
+            onClick={() => this.handleTextClick({
+              textName: 'introduction',
+            })}>
+            {introduction || '点击编辑简介'}
+          </Button>
         </Typography>
-        {/* 编辑昵称 Modal */}
-        <EditNicknameModal
-          open={showEditNicknameModal}
-          onClose={this.closeEditNicknameModal}
+        {/* 编辑昵称/简介 Modal */}
+        <EditModal
+          open={showEditModal}
+          onClose={this.closeEditModal}
           user={user}
           token={token}
           relay={relay}
+          textName={textName}
         />
         <Toast
           open={showToast}
@@ -199,6 +212,7 @@ export default createFragmentContainer(My, {
       id,
       avatar,
       nickname,
+      introduction,
     }
   `,
 })

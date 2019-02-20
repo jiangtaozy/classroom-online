@@ -1,7 +1,7 @@
 /*
  * Maintained by jemo from 2018.12.10 to now
  * Created by jemo on 2018.12.10 22:21:43
- * edit nickname modal
+ * edit nickname or introduction modal
  */
 
 import React, { Component } from 'react'
@@ -13,14 +13,25 @@ import {
 import Toast from '../toast'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 
-class EditNicknameModal extends Component {
+const labelMap = {
+  nickname: '昵称',
+  introduction: '简介',
+}
+
+class EditModal extends Component {
   
   constructor(props) {
     super(props)
-    const { user } = props
-    const { nickname } = user || {}
+    const {
+      user,
+    } = props
+    const {
+      nickname = '',
+      introduction = '',
+    } = user || {}
     this.state = {
       nickname,
+      introduction,
       showToast: false,
       toastMessage: '',
     }
@@ -36,19 +47,21 @@ class EditNicknameModal extends Component {
 
   // handle confirm button click
   handleConfirmButtonClick = () => {
-    const { nickname } = this.state
     const {
+      user,
       token,
       relay,
-      user,
+      textName,
     } = this.props
+    const textLabel = labelMap[textName]
+    const textValue = this.state[textName]
     const {
       id,
     } = user || {}
-    if(!nickname) {
+    if(!textValue) {
       this.setState({
         showToast: true,
-        toastMessage: '请输入昵称',
+        toastMessage: `请输入昵称${textLabel}`,
       })
       return
     }
@@ -59,14 +72,15 @@ class EditNicknameModal extends Component {
       })
       return
     }
-    UpdateUserMutation.commit({
+    const commitData = {
       environment: relay.environment,
-      nickname,
-      id,
+      clientMutationId: id,
       token,
       onCompleted: this.onUpdateUserCompleted,
       onError: this.onUpdateUserError,
-    })
+    }
+    commitData[textName] = textValue
+    UpdateUserMutation.commit(commitData)
   }
 
   // on update user completed
@@ -114,12 +128,14 @@ class EditNicknameModal extends Component {
     const {
       open,
       onClose,
+      textName,
     } = this.props
     const {
-      nickname,
       showToast,
       toastMessage,
     } = this.state
+    const textLabel = labelMap[textName]
+    const textValue = this.state[textName]
     return (
       <div>
         <Modal
@@ -139,9 +155,9 @@ class EditNicknameModal extends Component {
               flexDirection: 'column',
             }}>
             <TextField
-              label='修改昵称'
-              name='nickname'
-              value={nickname}
+              label={`编辑${textLabel}`}
+              name={textName}
+              value={textValue}
               onChange={this.handleInputChange}
               style={{
                 width: 250,
@@ -169,4 +185,4 @@ class EditNicknameModal extends Component {
   }
 }
 
-export default EditNicknameModal
+export default EditModal

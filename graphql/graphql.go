@@ -41,6 +41,8 @@ type User struct {
   Password string `json:"password" gorethink:"password"`
   Nickname string `json:"nickname" gorethink:"nickname"`
   Avatar string `json:"avatar" gorethink:"avatar"`
+  BackgroundImage string `json:"backgroundImage" gorethink:"backgroundImage"`
+  Introduction string `json:"introduction" gorethink:"introduction"`
 }
 type PostData struct {
   Query string `json:"query"`
@@ -98,6 +100,9 @@ func Init() {
       "avatar": &graphql.Field{
         Type: graphql.String,
       },
+      "introduction": &graphql.Field{
+        Type: graphql.String,
+      },
     },
     Interfaces: []*graphql.Interface{
       nodeDefinitions.NodeInterface,
@@ -110,6 +115,12 @@ func Init() {
         Type: graphql.NewNonNull(graphql.String),
       },
       "nickname": &graphql.InputObjectFieldConfig{
+        Type: graphql.String,
+      },
+      "avatar": &graphql.InputObjectFieldConfig{
+        Type: graphql.String,
+      },
+      "introduction": &graphql.InputObjectFieldConfig{
         Type: graphql.String,
       },
     },
@@ -126,78 +137,28 @@ func Init() {
       },
     },
     MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
-      tokenString, ok := inputMap["token"].(string)
-      if !ok {
-        return map[string]interface{} {
-          "error": true,
-          "message": "token type error!",
-        }, nil
-      }
-      nickname := inputMap["nickname"]
+      tokenString := inputMap["token"].(string)
       id := GetUserIdFromToken(tokenString)
-      var user = map[string]interface{}{
-        "nickname": nickname,
+      nickname := inputMap["nickname"]
+      avatar := inputMap["avatar"]
+      introduction := inputMap["introduction"]
+      user := make(map[string]interface{})
+      if nickname != nil {
+        user["nickname"] = nickname
+      }
+      if avatar != nil {
+        user["avatar"] = avatar
+      }
+      if introduction != nil {
+        user["introduction"] = introduction
       }
       updateResponse, err := gorethink.Table("user").Get(id).Update(user).RunWrite(session)
       if err != nil {
         log.Println("updateUserMutationUpdateError, error: ", err)
-        return map[string]interface{} {
-          "error": true,
-          "message": "update error!",
-        }, nil
+        return nil, nil
       }
       if updateResponse.Errors != 0 {
         log.Printf("updateUserMutationUpdateResponseError, updateResponse: %+v\n", updateResponse)
-        return map[string]interface{} {
-          "error": true,
-          "message": "update error!",
-        }, nil
-      }
-      return map[string]interface{} {
-        "id": id,
-      }, nil
-    },
-  })
-  updateAvatarMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
-    Name: "UpdateAvatar",
-    InputFields: graphql.InputObjectConfigFieldMap{
-      "token": &graphql.InputObjectFieldConfig{
-        Type: graphql.NewNonNull(graphql.String),
-      },
-      "filename": &graphql.InputObjectFieldConfig{
-        Type: graphql.NewNonNull(graphql.String),
-      },
-    },
-    OutputFields: graphql.Fields{
-      "user": &graphql.Field{
-        Type: userType,
-        Description: "user info",
-        Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-          if payload, ok := params.Source.(map[string]interface{}); ok {
-            return GetUser(payload["id"].(string)), nil
-          }
-          return nil, nil
-        },
-      },
-    },
-    MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
-      tokenString, ok := inputMap["token"].(string)
-      filename, ok := inputMap["filename"].(string)
-      if !ok {
-        log.Println("updateAvatarMutationInputMapError")
-        return nil, nil
-      }
-      id := GetUserIdFromToken(tokenString)
-      var user = map[string]interface{}{
-        "avatar": filename,
-      }
-      updateResponse, err := gorethink.Table("user").Get(id).Update(user).RunWrite(session)
-      if err != nil {
-        log.Println("updateAvatarMutationUpdateError, error: ", err)
-        return nil, nil
-      }
-      if updateResponse.Errors != 0 {
-        log.Printf("updateAvatarMutationUpdateResponseError, updateResponse: %+v\n", updateResponse)
         return nil, nil
       }
       return map[string]interface{} {
@@ -212,7 +173,6 @@ func Init() {
       "createUser": createUserMutation,
       "getToken": getTokenMutation,
       "updateUser": updateUserMutation,
-      "updateAvatar": updateAvatarMutation,
     },
   })
   rootQuery := graphql.NewObject(graphql.ObjectConfig{
@@ -288,8 +248,11 @@ func GraphqlHandle(w http.ResponseWriter, r *http.Request) {
     }
     defer file.Close()
     input := data.Variables["input"].(map[string]interface{})
-    input["filename"] = handler.Filename
-    f, err := os.OpenFile("./public/" + handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+    filekey := input["filekey"].(string)
+    generatedFilename := GenerateUniqueFilename(filekey + "-", "-" + handler.Filename)
+    input[filekey] = generatedFilename
+    delete(input, "filekey")
+    f, err := os.OpenFile("./public/" + generatedFilename, os.O_WRONLY|os.O_CREATE, 0666)
     if err != nil {
       log.Println("GraphqlHandlerOpenFileError: ", err)
     }

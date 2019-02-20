@@ -7,6 +7,7 @@ type User implements Node {
   token: String
   nickname: String
   avatar: String
+  introduction: String
 }
 
 type Result {
@@ -71,23 +72,11 @@ input UpdateUserInput {
   token: String!
   nickname: String
   clientMutationId: String
+  filekey: String
+  introduction: String
 }
 
 type UpdateUserPayload {
-  user: User
-  clientMutationId: String
-}
-
-"""
-  update avatar mutation
-"""
-
-input UpdateAvatarInput {
-  token: String!
-  clientMutationId: String
-}
-
-type UpdateAvatarPayload {
   user: User
   clientMutationId: String
 }
@@ -101,7 +90,6 @@ type Mutation {
   createUser(input: CreateUserInput!): CreateUserPayload
   getToken(input: GetTokenInput!): GetTokenPayload
   updateUser(input: UpdateUserInput!): UpdateUserPayload
-  updateAvatar(input: UpdateAvatarInput!): UpdateAvatarPayload
 }
 
 """

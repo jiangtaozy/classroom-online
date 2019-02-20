@@ -9,9 +9,6 @@ import ReactDOM from 'react-dom'
 import registerServiceWorker from './registerServiceWorker'
 import { css } from 'glamor'
 import App from './components/app'
-//import Router from './router'
-//import { Resolver } from 'found-relay'
-//import environment from './environment'
 //import vconsole from 'vconsole'
 
 //new vconsole()

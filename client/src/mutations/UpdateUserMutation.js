@@ -11,16 +11,21 @@ const mutation = graphql`
     updateUser(input: $input) {
       user {
         nickname
+        avatar
+        introduction
       }
     }
   }
 `
 
 const commit = ({
-  environment,
   nickname,
-  id,
+  introduction,
+  file,
+  filekey,
   token,
+  clientMutationId,
+  environment,
   onCompleted,
   onError,
 }) => {
@@ -30,11 +35,18 @@ const commit = ({
       mutation,
       variables: {
         input: {
-          nickname,
+          ...(nickname && {nickname}),
+          ...(introduction && {introduction}),
+          ...(filekey && {filekey}),
           token,
-          clientMutationId: id,
+          clientMutationId,
         },
       },
+      ...(file && {
+        uploadables: {
+          file,
+        },
+      }),
       onCompleted,
       onError,
     },
