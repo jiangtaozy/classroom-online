@@ -38,28 +38,30 @@ class My extends Component {
     })
   }
 
-  onAvatarSelected = (acceptedFiles, rejectedFiles) => {
-    const {
-      user,
-      token,
-      relay,
-    } = this.props
-    if(!token) {
-      this.setState({
-        showToast: true,
-        toastMessage: '请先登录',
+  onImageSelected = (fileKey) => {
+    return (acceptedFiles, rejectedFiles) => {
+      const {
+        user,
+        token,
+        relay,
+      } = this.props
+      if(!token) {
+        this.setState({
+          showToast: true,
+          toastMessage: '请先登录',
+        })
+        return
+      }
+      UpdateUserMutation.commit({
+        environment: relay.environment,
+        file: acceptedFiles[0],
+        fileKey,
+        clientMutationId: user.id,
+        token,
+        onCompleted: this.onUpdateAvatarCompleted,
+        onError: this.onUpdateAvatarError,
       })
-      return
     }
-    UpdateUserMutation.commit({
-      environment: relay.environment,
-      file: acceptedFiles[0],
-      filekey: 'avatar',
-      clientMutationId: user.id,
-      token,
-      onCompleted: this.onUpdateAvatarCompleted,
-      onError: this.onUpdateAvatarError,
-    })
   }
 
   onUpdateAvatarCompleted = (response, errors) => {
@@ -112,6 +114,7 @@ class My extends Component {
       nickname,
       avatar,
       introduction,
+      backgroundImage,
     } = user || {}
     return (
       <div
@@ -120,15 +123,27 @@ class My extends Component {
           flexDirection: 'column',
         }}>
         {/* 背景图 */}
-        <img
-          style={{
-            width: '100%',
-            height: '50vh',
-            objectFit: 'cover',
+        <Dropzone
+          onDrop={this.onImageSelected('backgroundImage')}>
+          {({getRootProps, getInputProps}) => {
+            return (
+              <div
+                {...getRootProps()}>
+                <input
+                  {...getInputProps()} />
+                <img
+                  style={{
+                    width: '100%',
+                    height: '50vh',
+                    objectFit: 'cover',
+                  }}
+                  src={backgroundImage || '/image/one-piece.jpg'}
+                  alt='背景图'
+                />
+              </div>
+            )
           }}
-          src='/image/one-piece.jpg'
-          alt='背景图'
-        />
+        </Dropzone>
         {/* 头像和昵称　*/}
         <div
           style={{
@@ -137,7 +152,7 @@ class My extends Component {
             alignItems: 'center',
           }}>
           <Dropzone
-            onDrop={this.onAvatarSelected}>
+            onDrop={this.onImageSelected('avatar')}>
             {({getRootProps, getInputProps}) => {
               return (
                 <div
@@ -213,6 +228,7 @@ export default createFragmentContainer(My, {
       avatar,
       nickname,
       introduction,
+      backgroundImage,
     }
   `,
 })

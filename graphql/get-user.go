@@ -21,5 +21,6 @@ func GetUser(id string) User {
   cursor.One(&user)
   cursor.Close()
   user.Avatar = staticFilePath + user.Avatar
+  user.BackgroundImage = staticFilePath + user.BackgroundImage
   return user
 }

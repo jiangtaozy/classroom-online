@@ -8,6 +8,7 @@ type User implements Node {
   nickname: String
   avatar: String
   introduction: String
+  backgroundImage: String
 }
 
 type Result {
@@ -72,7 +73,7 @@ input UpdateUserInput {
   token: String!
   nickname: String
   clientMutationId: String
-  filekey: String
+  fileKey: String
   introduction: String
 }
 

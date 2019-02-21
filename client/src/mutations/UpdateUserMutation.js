@@ -13,6 +13,7 @@ const mutation = graphql`
         nickname
         avatar
         introduction
+        backgroundImage
       }
     }
   }
@@ -22,7 +23,7 @@ const commit = ({
   nickname,
   introduction,
   file,
-  filekey,
+  fileKey,
   token,
   clientMutationId,
   environment,
@@ -37,7 +38,7 @@ const commit = ({
         input: {
           ...(nickname && {nickname}),
           ...(introduction && {introduction}),
-          ...(filekey && {filekey}),
+          ...(fileKey && {fileKey}),
           token,
           clientMutationId,
         },

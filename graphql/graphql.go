@@ -41,8 +41,8 @@ type User struct {
   Password string `json:"password" gorethink:"password"`
   Nickname string `json:"nickname" gorethink:"nickname"`
   Avatar string `json:"avatar" gorethink:"avatar"`
-  BackgroundImage string `json:"backgroundImage" gorethink:"backgroundImage"`
   Introduction string `json:"introduction" gorethink:"introduction"`
+  BackgroundImage string `json:"backgroundImage" gorethink:"backgroundImage"`
 }
 type PostData struct {
   Query string `json:"query"`
@@ -103,6 +103,9 @@ func Init() {
       "introduction": &graphql.Field{
         Type: graphql.String,
       },
+      "backgroundImage": &graphql.Field{
+        Type: graphql.String,
+      },
     },
     Interfaces: []*graphql.Interface{
       nodeDefinitions.NodeInterface,
@@ -121,6 +124,9 @@ func Init() {
         Type: graphql.String,
       },
       "introduction": &graphql.InputObjectFieldConfig{
+        Type: graphql.String,
+      },
+      "backgroundImage": &graphql.InputObjectFieldConfig{
         Type: graphql.String,
       },
     },
@@ -142,6 +148,7 @@ func Init() {
       nickname := inputMap["nickname"]
       avatar := inputMap["avatar"]
       introduction := inputMap["introduction"]
+      backgroundImage := inputMap["backgroundImage"]
       user := make(map[string]interface{})
       if nickname != nil {
         user["nickname"] = nickname
@@ -151,6 +158,9 @@ func Init() {
       }
       if introduction != nil {
         user["introduction"] = introduction
+      }
+      if backgroundImage != nil {
+        user["backgroundImage"] = backgroundImage
       }
       updateResponse, err := gorethink.Table("user").Get(id).Update(user).RunWrite(session)
       if err != nil {
@@ -248,10 +258,10 @@ func GraphqlHandle(w http.ResponseWriter, r *http.Request) {
     }
     defer file.Close()
     input := data.Variables["input"].(map[string]interface{})
-    filekey := input["filekey"].(string)
-    generatedFilename := GenerateUniqueFilename(filekey + "-", "-" + handler.Filename)
-    input[filekey] = generatedFilename
-    delete(input, "filekey")
+    fileKey := input["fileKey"].(string)
+    generatedFilename := GenerateUniqueFilename(fileKey + "-", "-" + handler.Filename)
+    input[fileKey] = generatedFilename
+    delete(input, "fileKey")
     f, err := os.OpenFile("./public/" + generatedFilename, os.O_WRONLY|os.O_CREATE, 0666)
     if err != nil {
       log.Println("GraphqlHandlerOpenFileError: ", err)
