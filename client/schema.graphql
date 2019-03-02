@@ -11,6 +11,10 @@ type User implements Node {
   backgroundImage: String
 }
 
+type Viewer {
+  userList(status: String = "any", after: String, first: Int, before: String, last: Int): UserConnection
+}
+
 type Result {
   error: Boolean!
   message: String
@@ -101,6 +105,24 @@ type Query {
   node(
     id: ID!
   ): Node
+  viewer: Viewer
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]
+}
+
+type UserEdge {
+  node: User
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }
 
 interface Node {

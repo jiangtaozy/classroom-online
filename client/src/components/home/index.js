@@ -17,6 +17,7 @@ class Home extends Component {
     const {
       user,
       token,
+      viewer,
     } = this.props
     return(
       <div>
@@ -30,7 +31,8 @@ class Home extends Component {
             return (
               <My
                 user={user}
-                token={token}/>
+                token={token}
+              />
             )
           }}
         />
@@ -40,7 +42,13 @@ class Home extends Component {
         />
         <Route
           path='/school'
-          component={School}
+          render={() => {
+            return (
+              <School
+                viewer={viewer}
+              />
+            )
+          }}
         />
         {/* mobile 导航栏 */}
         <MediaQuery query='(max-device-width: 1224px)'>

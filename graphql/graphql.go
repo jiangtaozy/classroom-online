@@ -31,7 +31,9 @@ const (
   requestTimeout = 10 * time.Second
 )
 var userType *graphql.Object
+var viewerType *graphql.Object
 var nodeDefinitions *relay.NodeDefinitions
+var userConnection *relay.GraphQLConnectionDefinitions
 var schema graphql.Schema
 var hmacSecret = []byte("my_secret_key")
 
@@ -43,6 +45,9 @@ type User struct {
   Avatar string `json:"avatar" gorethink:"avatar"`
   Introduction string `json:"introduction" gorethink:"introduction"`
   BackgroundImage string `json:"backgroundImage" gorethink:"backgroundImage"`
+}
+type Viewer struct {
+  UserList []User `json:"userList"`
 }
 type PostData struct {
   Query string `json:"query"`
@@ -109,6 +114,41 @@ func Init() {
     },
     Interfaces: []*graphql.Interface{
       nodeDefinitions.NodeInterface,
+    },
+  })
+  userConnection = relay.ConnectionDefinitions(relay.ConnectionConfig{
+    Name: "UserConnection",
+    NodeType: userType,
+  })
+  viewerType = graphql.NewObject(graphql.ObjectConfig{
+    Name: "Viewer",
+    Description: "app viewer",
+    Fields: graphql.Fields{
+      "userList": &graphql.Field{
+        Type: userConnection.ConnectionType,
+        Description: "user list",
+        Args: relay.ConnectionArgs,
+        Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+          args := relay.NewConnectionArguments(p.Args)
+          rows, err := gorethink.Table("user").Run(session)
+          if err != nil {
+            log.Printf("error: %v\n", err)
+            return User{}, nil
+          }
+          var userList []User
+          err = rows.All(&userList)
+          if err != nil {
+            log.Printf("error: %v\n", err)
+          }
+          userSlice := make([]interface{}, len(userList))
+          for i, user := range userList {
+            user.Avatar = staticFilePath + user.Avatar
+            user.BackgroundImage = staticFilePath + user.BackgroundImage
+            userSlice[i] = user
+          }
+          return relay.ConnectionFromArray(userSlice, args), nil
+        },
+      },
     },
   })
   updateUserMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
@@ -205,21 +245,11 @@ func Init() {
           return GetUser(id), nil
         },
       },
-      "userList": &graphql.Field{
-        Type: graphql.NewList(userType),
-        Description: "List of users",
+      "viewer": &graphql.Field{
+        Type: viewerType,
+        Description: "app viewer",
         Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-          rows, err := gorethink.Table("user").Run(session)
-          if err != nil {
-            log.Printf("error: %v\n", err)
-            return User{}, nil
-          }
-          var userList []User
-          err = rows.All(&userList)
-          if err != nil {
-            log.Printf("error: %v\n", err)
-          }
-          return userList, nil
+          return Viewer{}, nil
         },
       },
       "node": nodeDefinitions.NodeField,

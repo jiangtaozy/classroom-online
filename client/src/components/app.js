@@ -49,6 +49,9 @@ class App extends Component {
           query appQuery($token: String) {
             user(token: $token) {
               ...my_user,
+            },
+            viewer {
+              ...school_viewer,
             }
           }
         `}
@@ -80,7 +83,13 @@ class App extends Component {
                 />
                 <Route
                   path='/school'
-                  component={Home}
+                  render={() => {
+                    return (
+                      <Home
+                        viewer={props.viewer}
+                      />
+                    )
+                  }}
                 />
                 <Route
                   path='/about'
@@ -96,7 +105,7 @@ class App extends Component {
                 />
                 <Redirect
                   from='/'
-                  to='/my'
+                  to='/school'
                 />
               </Switch>
             </Router>
