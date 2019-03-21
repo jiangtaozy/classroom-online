@@ -10,7 +10,7 @@ import webrtc from 'webrtc-adapter'
 class Chatroom extends Component {
   componentDidMount() {
     // WebSocket
-    let webSocket = new WebSocket("wss://192.168.1.103:3000/ws")
+    let webSocket = new WebSocket("wss://192.168.1.106:3001/ws")
     //let webSocket = new WebSocket("wss://destpact.com:3000/ws")
     webSocket.onopen = function(event) {
       console.log('onopen event: ', event)
@@ -21,15 +21,15 @@ class Chatroom extends Component {
     webSocket.onclose = function(event) {
       console.log('onclose event: ', event)
     }
-    const configuration = { 
-      "iceServers": [
+    const configuration = {
+      iceServers: [
         {
-          "url": "stun:destpact.com:3478"
+          url: "stun:destpact.com:3478"
         },
         {
-          "url": "turn:destpact.com:3479"
+          url: "turn:destpact.com:3479",
         }
-      ] 
+      ]
     }
     // RTCPeerConnection
     let pc = new RTCPeerConnection(configuration)
@@ -63,7 +63,7 @@ class Chatroom extends Component {
     webSocket.onmessage = function(event) {
       let {desc, candidate} = JSON.parse(event.data)
       if(desc) {
-        if(desc.type == 'offer') {
+        if(desc.type === 'offer') {
           console.log('onmessage desc offer')
           pc.setRemoteDescription(desc).then(() => {
             return pc.createAnswer().then(answer => {
@@ -75,7 +75,7 @@ class Chatroom extends Component {
           }).catch(err => {
             console.log('onmessage offer desc, error: ', err)
           })
-        } else if(desc.type == 'answer') {
+        } else if(desc.type === 'answer') {
           console.log('onmessage desc answer')
           pc.setRemoteDescription(desc).catch(err => {
             console.log('pc.setRemoteDescription() , error: ', err)

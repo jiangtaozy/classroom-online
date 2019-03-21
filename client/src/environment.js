@@ -39,8 +39,7 @@ function fetchQuery(
     }
   }
   return axios.post(
-    //'http://127.0.0.1:3001/graphql',
-    'http://192.168.1.106:4000/graphql',
+    'https://192.168.1.106:3001/graphql',
     request
   ).then(response => {
     return response.data

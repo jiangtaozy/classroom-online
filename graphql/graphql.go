@@ -142,8 +142,8 @@ func Init() {
           }
           userSlice := make([]interface{}, len(userList))
           for i, user := range userList {
-            user.Avatar = staticFilePath + user.Avatar
-            user.BackgroundImage = staticFilePath + user.BackgroundImage
+            user.Avatar = uploadFilePath + user.Avatar
+            user.BackgroundImage = uploadFilePath + user.BackgroundImage
             userSlice[i] = user
           }
           return relay.ConnectionFromArray(userSlice, args), nil

@@ -9,8 +9,8 @@ import NavigationBar from '../navigation-bar/'
 import MediaQuery from 'react-responsive'
 import { Route } from 'react-router-dom'
 import My from '../my'
-import Classroom from '../classroom'
 import School from '../school'
+import Chatroom from '../chatroom'
 
 class Home extends Component {
   render() {
@@ -38,7 +38,7 @@ class Home extends Component {
         />
         <Route
           path='/classroom'
-          component={Classroom}
+          component={Chatroom}
         />
         <Route
           path='/school'

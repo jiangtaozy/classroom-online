@@ -13,8 +13,8 @@ classroom-online
 go.mod
 go.sum
 
-# public
-public
+# upload
+upload
 
 # gin
 gin-bin

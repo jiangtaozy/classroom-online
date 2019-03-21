@@ -25,15 +25,20 @@ func main() {
   go hub.Run()
   mux := http.NewServeMux()
   mux.Handle("/", http.FileServer(http.Dir("./client/build")))
-  mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
+  mux.Handle("/upload/", http.StripPrefix("/upload/", http.FileServer(http.Dir("./upload"))))
   mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
     signal.ServeWs(hub, w, r)
   })
   mux.HandleFunc("/graphql", graphql.GraphqlHandle)
-  handler := cors.Default().Handler(mux)
-  log.Printf("listen at %s\n", *port)
-  err := http.ListenAndServe(*port, handler)
-  //err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", nil)
+  c := cors.New(cors.Options{
+    AllowedOrigins:   []string{"https://localhost:3000", "https://192.168.1.106:3000"},
+    AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+    AllowCredentials: true,
+  })
+  handler := c.Handler(mux)
+  log.Printf("listen at https %s\n", *port)
+  //err := http.ListenAndServeTLS(*port, "/etc/letsencrypt/live/destpact.com/fullchain.pem", "/etc/letsencrypt/live/destpact.com/privkey.pem", handler)
+  err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", handler)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }
