@@ -5,22 +5,38 @@
  */
 
 import React, { Component } from 'react'
-import webrtc from 'webrtc-adapter'
+//import webrtc from 'webrtc-adapter'
 
 class Chatroom extends Component {
   componentDidMount() {
+    let {
+      match: {
+        params: {
+          teacherId,
+        },
+      },
+      user,
+    } = this.props
+    const {
+      id,
+    } = user || {}
+    // chatroom of self
+    if(teacherId === '0') {
+      teacherId = id
+    }
     // WebSocket
-    let webSocket = new WebSocket("wss://192.168.1.106:3001/ws")
+    let webSocket = new WebSocket(`wss://192.168.1.106:3001/ws?teacherId=${teacherId}`)
     //let webSocket = new WebSocket("wss://destpact.com:3000/ws")
     webSocket.onopen = function(event) {
-      console.log('onopen event: ', event)
+      console.log('websocket open event: ', event)
     }
     webSocket.onerror = function(event) {
-      console.log('onerror event: ', event)
+      console.log('websocket error event: ', event)
     }
     webSocket.onclose = function(event) {
-      console.log('onclose event: ', event)
+      console.log('websocket close event: ', event)
     }
+    /*
     const configuration = {
       iceServers: [
         {
@@ -28,12 +44,16 @@ class Chatroom extends Component {
         },
         {
           url: "turn:destpact.com:3479",
+          username: "jemo",
+          credential: "12345",
         }
       ]
     }
+    */
     // RTCPeerConnection
-    let pc = new RTCPeerConnection(configuration)
-    // send any ice candidates to the other peer
+    //let pc = new RTCPeerConnection(configuration)
+    let pc = new RTCPeerConnection()
+    // send ice candidates to the other peer
     pc.onicecandidate = ({candidate}) => {
       console.log('send ice candidate: ', {candidate})
       webSocket.send(JSON.stringify({candidate}))
@@ -64,7 +84,7 @@ class Chatroom extends Component {
       let {desc, candidate} = JSON.parse(event.data)
       if(desc) {
         if(desc.type === 'offer') {
-          console.log('onmessage desc offer')
+          console.log('receive offer')
           pc.setRemoteDescription(desc).then(() => {
             return pc.createAnswer().then(answer => {
               return pc.setLocalDescription(answer).then(() => {
@@ -73,10 +93,10 @@ class Chatroom extends Component {
               })
             })
           }).catch(err => {
-            console.log('onmessage offer desc, error: ', err)
+            console.log('setRemoteDescriptionError: ', err)
           })
         } else if(desc.type === 'answer') {
-          console.log('onmessage desc answer')
+          console.log('receive answer')
           pc.setRemoteDescription(desc).catch(err => {
             console.log('pc.setRemoteDescription() , error: ', err)
           })
@@ -84,7 +104,7 @@ class Chatroom extends Component {
           console.log('Unsupported SDP type')
         }
       } else if(candidate) {
-        console.log('onmessage candidate')
+        console.log('receive candidate')
         pc.addIceCandidate(candidate).catch(err => {
           console.log('pc.addIceCandidate(), error: ', err)
         })

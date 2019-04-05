@@ -15,6 +15,7 @@ import Home from './home'
 import About from './about'
 import Register from './register'
 import Login from './login'
+import Chatroom from './chatroom'
 import { getLastObject } from '../indexedDB'
 import environment from '../environment'
 import { graphql, QueryRenderer } from 'react-relay'
@@ -48,7 +49,11 @@ class App extends Component {
         query={graphql`
           query appQuery($token: String) {
             user(token: $token) {
-              ...my_user,
+              id,
+              avatar,
+              nickname,
+              introduction,
+              backgroundImage,
             },
             viewer {
               ...school_viewer,
@@ -63,6 +68,10 @@ class App extends Component {
           if(!props) {
             return <div>Loading...</div>
           }
+          const {
+            user,
+            viewer,
+          } = props
           return (
             <Router>
               <Switch>
@@ -71,22 +80,19 @@ class App extends Component {
                   render={() => {
                     return (
                       <Home
-                        user={props.user}
+                        user={user}
                         token={token}
                       />
                     )}
                   }
                 />
                 <Route
-                  path='/classroom'
-                  component={Home}
-                />
-                <Route
                   path='/school'
                   render={() => {
                     return (
                       <Home
-                        viewer={props.viewer}
+                        user={user}
+                        viewer={viewer}
                       />
                     )
                   }}
@@ -102,6 +108,18 @@ class App extends Component {
                 <Route
                   path='/login'
                   component={Login}
+                />
+                <Route
+                  path='/classroom/:teacherId'
+                  render={(routeProps) => {
+                    return (
+                      <Chatroom
+                        user={user}
+                        token={token}
+                        {...routeProps}
+                      />
+                    )}
+                  }
                 />
                 <Redirect
                   from='/'

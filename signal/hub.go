@@ -6,7 +6,7 @@
 package signal
 
 import (
-  "log"
+  //"log"
 )
 
 // Message, include message and client
@@ -45,28 +45,24 @@ func (h *Hub) Run() {
     if len(h.clients) > 1 {
       select {
       case client := <-h.register:
-        log.Printf("register\n")
         h.clients[client] = true
       case client := <-h.unregister:
         if _, ok := h.clients[client]; ok {
-          log.Printf("unregister\n")
           delete(h.clients, client)
           close(client.send)
         }
       case message := <-h.broadcast:
         for client := range h.clients {
-          if message.client != client {
-            //log.Printf("message.client != client")
-            log.Printf("message.msg: %s\n", message.msg)
+          if message.client != client &&
+            message.client.teacherId == client.teacherId {
             select {
-              //case client.send <- message:
             case client.send <- message.msg:
             default:
               close(client.send)
               delete(h.clients, client)
             }
           } else {
-            //log.Printf("message.client == client")
+            // do nothing
           }
         }
       }

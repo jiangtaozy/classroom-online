@@ -7,11 +7,11 @@
 import React, { Component } from 'react'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import { graphql, createFragmentContainer } from 'react-relay'
 import EditModal from './edit-modal'
 import Dropzone from 'react-dropzone'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 import Toast from '../toast'
+import environment from '../../environment'
 
 class My extends Component {
 
@@ -43,7 +43,6 @@ class My extends Component {
       const {
         user,
         token,
-        relay,
       } = this.props
       if(!token) {
         this.setState({
@@ -53,7 +52,7 @@ class My extends Component {
         return
       }
       UpdateUserMutation.commit({
-        environment: relay.environment,
+        environment,
         file: acceptedFiles[0],
         fileKey,
         clientMutationId: user.id,
@@ -108,7 +107,6 @@ class My extends Component {
     const {
       user,
       token,
-      relay,
     } = this.props
     const {
       nickname,
@@ -208,7 +206,6 @@ class My extends Component {
           onClose={this.closeEditModal}
           user={user}
           token={token}
-          relay={relay}
           textName={textName}
         />
         <Toast
@@ -221,14 +218,4 @@ class My extends Component {
   }
 }
 
-export default createFragmentContainer(My, {
-  user: graphql`
-    fragment my_user on User {
-      id,
-      avatar,
-      nickname,
-      introduction,
-      backgroundImage,
-    }
-  `,
-})
+export default My

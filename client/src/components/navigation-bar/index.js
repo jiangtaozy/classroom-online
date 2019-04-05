@@ -9,19 +9,41 @@ import React, { Component } from 'react'
 import MediaQuery from 'react-responsive'
 import { NavLink } from 'react-router-dom'
 
-const linkStyle = {
-  padding: 12,
-  textDecoration: 'none',
-  color: 'inherit',
-  fontSize: 14,
-}
-
-const activeLinkStyle = {
-  color: '#0000ff',
-}
+const navDataArray = [
+  {
+    title: '主页',
+    link: '/school',
+  },
+  {
+    title: '课堂',
+    link: '/classroom/0',
+  },
+  {
+    title: '我的',
+    link: '/my',
+  },
+]
 
 class NavigationBar extends Component {
   render() {
+    const navLinkList = navDataArray.map((navItem, index) => {
+      return (
+        <NavLink
+          style={{
+            padding: 12,
+              textDecoration: 'none',
+              color: 'inherit',
+              fontSize: 14,
+          }}
+          activeStyle={{
+            color: '#0000ff',
+          }}
+          to={navItem.link}
+          key={index}>
+          {navItem.title}
+        </NavLink>
+      )
+    })
     return (
       <div
         style={{
@@ -39,30 +61,7 @@ class NavigationBar extends Component {
             borderTopColor: 'rgba(0, 0, 0, 0.2)',
             borderTopWidth: 1,
           }}>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/my'>
-              我的主页
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/classroom'>
-              我的课堂
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/school'>
-              我的学校
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/login'>
-              登录
-            </NavLink>
+            {navLinkList}
           </div>
         </MediaQuery>
         {/* pc or laptop 台式电脑或笔记本 */}
@@ -74,30 +73,7 @@ class NavigationBar extends Component {
             display: 'flex',
             justifyContent: 'space-around',
           }}>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/my'>
-              我的主页
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/classroom'>
-              我的课堂
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/school'>
-              我的学校
-            </NavLink>
-            <NavLink
-              style={linkStyle}
-              activeStyle={activeLinkStyle}
-              to='/login'>
-              登录
-            </NavLink>
+            {navLinkList}
           </div>
         </MediaQuery>
       </div>

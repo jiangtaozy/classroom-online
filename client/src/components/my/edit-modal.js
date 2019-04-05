@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core'
 import Toast from '../toast'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
+import environment from '../../environment'
 
 const labelMap = {
   nickname: '昵称',
@@ -50,7 +51,6 @@ class EditModal extends Component {
     const {
       user,
       token,
-      relay,
       textName,
     } = this.props
     const textLabel = labelMap[textName]
@@ -73,7 +73,7 @@ class EditModal extends Component {
       return
     }
     const commitData = {
-      environment: relay.environment,
+      environment,
       clientMutationId: id,
       token,
       onCompleted: this.onUpdateUserCompleted,

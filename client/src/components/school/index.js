@@ -7,6 +7,7 @@
 import React, { Component } from 'react'
 import { graphql, createFragmentContainer } from 'react-relay'
 import Typography from '@material-ui/core/Typography'
+import { Link } from 'react-router-dom'
 
 class School extends Component {
   render() {
@@ -22,17 +23,20 @@ class School extends Component {
         {edges.map((edge, index) => {
           const { node } = edge || {}
           const {
-            backgroundImage,
+            id,
             avatar,
             nickname,
             introduction,
+            backgroundImage,
           } = node || {}
           return (
-            <div
+            <Link
+              to={`/classroom/${id}`}
               key={index}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
+                textDecoration: 'none',
               }}>
               {/* 背景图 */}
               <img
@@ -82,7 +86,7 @@ class School extends Component {
                 }}>
                 {introduction}
               </Typography>
-            </div>
+            </Link>
           )
         })}
       </div>
@@ -98,6 +102,7 @@ export default createFragmentContainer(School, {
       ) @connection(key: "school_userList") {
         edges {
           node {
+            id,
             avatar,
             nickname,
             introduction,

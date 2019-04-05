@@ -44,6 +44,7 @@ type Client struct {
   conn *websocket.Conn
   // Buffered channel of outbound messages.
   send chan []byte
+  teacherId string
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -127,7 +128,14 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
     log.Println(err)
     return
   }
-  client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+  query := r.URL.Query()
+  teacherId := query["teacherId"]
+  client := &Client{
+    hub: hub,
+    conn: conn,
+    send: make(chan []byte, 256),
+    teacherId: teacherId[0],
+  }
   client.hub.register <- client
   // Allow collection of memory referenced by the caller by doing all work in
   // new goroutines.
