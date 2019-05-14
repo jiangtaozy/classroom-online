@@ -30,6 +30,10 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    await this.getToken()
+  }
+
+  getToken = async () => {
     const lastUser = await getLastObject('user')
     const {
       token,
@@ -77,11 +81,12 @@ class App extends Component {
               <Switch>
                 <Route
                   path='/my'
-                  render={() => {
+                  render={(routeProps) => {
                     return (
                       <Home
                         user={user}
                         token={token}
+                        {...routeProps}
                       />
                     )}
                   }
@@ -107,19 +112,44 @@ class App extends Component {
                 />
                 <Route
                   path='/login'
-                  component={Login}
+                  render={(routeProps) => {
+                    return (
+                      <Login
+                        refreshToken={this.getToken}
+                        {...routeProps}
+                      />
+                    )
+                  }}
                 />
                 <Route
                   path='/classroom/:teacherId'
                   render={(routeProps) => {
-                    return (
-                      <Chatroom
-                        user={user}
-                        token={token}
-                        {...routeProps}
-                      />
-                    )}
-                  }
+                    const {
+                      location: {
+                        pathname
+                      }
+                    } = routeProps
+                    if(token) {
+                      return (
+                        <Chatroom
+                          user={user}
+                          token={token}
+                          {...routeProps}
+                        />
+                      )
+                    } else {
+                      return (
+                        <Redirect
+                          to={{
+                            pathname: "/login",
+                            state: {
+                              referrer: pathname
+                            }
+                          }}
+                        />
+                      )
+                    }
+                  }}
                 />
                 <Redirect
                   from='/'

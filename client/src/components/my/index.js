@@ -12,6 +12,7 @@ import Dropzone from 'react-dropzone'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 import Toast from '../toast'
 import environment from '../../environment'
+import { Link } from 'react-router-dom'
 
 class My extends Component {
 
@@ -107,6 +108,9 @@ class My extends Component {
     const {
       user,
       token,
+      location: {
+        pathname
+      }
     } = this.props
     const {
       nickname,
@@ -173,33 +177,55 @@ class My extends Component {
               )
             }}
           </Dropzone>
-          <Button
-            style={{
-              fontSize: 16,
-              padding: 12,
-              fontWeight: 'bold',
-              color: 'white',
-              textShadow: '1px 1px 1px black',
-            }}
-            onClick={() => this.handleTextClick({
-              textName: 'nickname',
-            })}>
-            {nickname || '点击编辑昵称'}
-          </Button>
+          {
+            token ?
+            <Button
+              style={{
+                fontSize: 16,
+                padding: 12,
+                fontWeight: 'bold',
+                color: 'white',
+                textShadow: '1px 1px 1px black',
+              }}
+              onClick={() => this.handleTextClick({
+                textName: 'nickname',
+              })}>
+              {nickname || '点击编辑昵称'}
+            </Button>:
+            <Link
+              to={{
+                pathname: "/login",
+                state: {
+                  referrer: pathname
+                }
+              }}
+              style={{
+                fontSize: 16,
+                padding: 12,
+                fontWeight: 'bold',
+                color: 'white',
+                textShadow: '1px 1px 1px black',
+              }}>
+              登录
+            </Link>
+          }
         </div>
         {/* 简介 */}
-        <Typography
-          component='p'
-          style={{
-            padding: 12,
-          }}>
-          <Button
-            onClick={() => this.handleTextClick({
-              textName: 'introduction',
-            })}>
-            {introduction || '点击编辑简介'}
-          </Button>
-        </Typography>
+        {
+          token &&
+          <Typography
+            component='p'
+            style={{
+              padding: 12,
+            }}>
+            <Button
+              onClick={() => this.handleTextClick({
+                textName: 'introduction',
+              })}>
+              {introduction || '点击编辑简介'}
+            </Button>
+          </Typography>
+        }
         {/* 编辑昵称/简介 Modal */}
         <EditModal
           open={showEditModal}

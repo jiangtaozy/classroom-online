@@ -131,6 +131,12 @@ class Chatroom extends Component {
   render() {
     return (
       <div>
+        <div
+          style={{
+            padding: 10,
+          }}>
+          在线课堂
+        </div>
         <video
           style={{
             maxWidth: '100%',

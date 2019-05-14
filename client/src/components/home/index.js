@@ -26,11 +26,12 @@ class Home extends Component {
         </MediaQuery>
         <Route
           path='/my'
-          render={() => {
+          render={(routeProps) => {
             return (
               <My
                 user={user}
                 token={token}
+                {...routeProps}
               />
             )
           }}

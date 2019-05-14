@@ -23,6 +23,7 @@ import Toast from '../toast'
 import GetTokenMutation from '../../mutations/GetTokenMutation'
 import environment from '../../environment'
 import { upsert } from '../../indexedDB'
+import { Link } from 'react-router-dom'
 
 const phoneRegex = /^1[3-9](\d{9})$/
 
@@ -30,10 +31,10 @@ class Login extends Component {
   constructor() {
     super()
     this.state = {
-      phone: '',
-      //phone: '18794769375',
-      password: '',
-      //password: '123456',
+      //phone: '',
+      phone: '18794769375',
+      //password: '',
+      password: '123456',
       showPassword: false,
       showToast: false,
       toastMessage: '',
@@ -43,8 +44,6 @@ class Login extends Component {
 
   // on login completed
   onLoginCompleted = async (response, errors) => {
-    //console.log('response: ', response)
-    //console.log('errors: ', errors)
     const { getToken } = response || {}
     const { getTokenResult } = getToken || {}
     const { error, message, phone, token } = getTokenResult || {}
@@ -70,11 +69,17 @@ class Login extends Component {
     catch(error) {
       console.error('LoginOnLoginCompletedCatchError, error: ', error)
     }
-    setTimeout(() => {
-      this.setState({
-        showToast: false,
-      })
-    }, 1000)
+    await this.props.refreshToken()
+    const {
+      history,
+      location: {
+        state
+      }
+    } = this.props
+    const {
+      referrer
+    } = state || {}
+    history.replace(referrer || '/')
   }
 
   // on login error
@@ -213,6 +218,16 @@ class Login extends Component {
           onClick={this.handleLoginClick}>
           立即登录
         </Button>
+        <Link
+          to='/register'
+          style={{
+            fontSize: 16,
+            color: '#636e72',
+            textDecoration: 'none',
+            marginTop: 40,
+          }}>
+          注册
+        </Link>
         <Toast
           open={showToast}
           message={toastMessage}
