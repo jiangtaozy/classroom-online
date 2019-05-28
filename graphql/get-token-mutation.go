@@ -56,12 +56,9 @@ var getTokenMutation = relay.MutationWithClientMutationID(relay.MutationConfig{
   },
   MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
     phone := inputMap["phone"].(string)
-    log.Println("phone: ", phone)
     password := inputMap["password"].(string)
-    log.Println("password: ", password)
     filterOpt := map[string]interface{}{
       "phone": phone,
-      "password": password,
     }
     cursor, err := gorethink.Table("user").Filter(&filterOpt).Run(session)
     if err != nil {
@@ -76,14 +73,21 @@ var getTokenMutation = relay.MutationWithClientMutationID(relay.MutationConfig{
         "message": "账号或密码错误",
       }, nil
     }
-    log.Println("user: ", user)
-    log.Println("user.Id: ", user.Id)
+    match, err := ComparePasswordAndHash(password, user.Password)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if(!match) {
+      return map[string]interface{}{
+        "error": true,
+        "message": "账号或密码错误",
+      }, nil
+    }
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
       "phone": phone,
       "id": user.Id,
     })
     tokenString, err := token.SignedString(hmacSecret)
-    log.Println("tokenString: ", tokenString)
     cursor.Close()
     return map[string]interface{}{
       "error": nil,

@@ -44,7 +44,6 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
       Type: resultType,
       Resolve: func(p graphql.ResolveParams) (interface{}, error) {
         if payload, ok := p.Source.(map[string]interface{}); ok {
-          //log.Println("payload: ", payload)
           return payload, nil
         }
         return nil, nil
@@ -86,7 +85,6 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
     dysms.HTTPDebugEnable = true
     dysms.SetACLClient(alismsAccessKeyId, alismsAccessKeySecret)
     uid := uuid.NewV4()
-    log.Println("uid: ", uid)
     randomNumber := rand.Intn(10000)
     log.Println("randomNumber: ", randomNumber)
     //log.Println("uid.String(): ", uid.String())

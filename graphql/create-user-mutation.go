@@ -50,7 +50,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
       Type: createUserResultType,
       Resolve: func(params graphql.ResolveParams) (interface{}, error) {
         if payload, ok := params.Source.(map[string]interface{}); ok {
-          //log.Println("payload: ", payload)
           return payload, nil
         }
         return nil, nil
@@ -59,11 +58,8 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
   },
   MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
     phone := inputMap["phone"].(string)
-    //log.Println("phone: ", phone)
     password := inputMap["password"].(string)
-    //log.Println("password: ", password)
     code := inputMap["code"].(string)
-    //log.Println("code: ", code)
     // 校验验证码
     etcdClient, err := clientv3.New(clientv3.Config{
       DialTimeout: dialTimeout,
@@ -95,8 +91,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
       }, nil
     }
     realCode := string(resp.Kvs[0].Value)
-    //log.Println("realCode: ", realCode)
-    //log.Println("code == realCode: ", code == realCode)
     if code != realCode {
       log.Println("验证码输入有误")
       return map[string]interface{}{
@@ -113,7 +107,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
     }
     cancel() // delete etcd connection
     // 注册用户
-    log.Println("phone: ", phone)
     filterOpt := map[string]interface{}{
       "phone": phone,
     }
@@ -123,7 +116,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
     }
     var count int
     err = cursor.One(&count)
-    log.Println("count: ", count)
     if count > 0 {
       return map[string]interface{}{
         "error": true,
@@ -131,11 +123,18 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
       }, nil
     }
     cursor.Close()
+    argon2Params := &Argon2Params{
+        memory:      64 * 1024,
+        iterations:  3,
+        parallelism: 2,
+        saltLength:  16,
+        keyLength:   32,
+    }
+    encodedHash, err := GenerateArgon2HashFromPassword(password, argon2Params)
     newUser := User{
       Phone: phone,
-      Password: password,
+      Password: encodedHash,
     }
-    log.Println("newUser: ", newUser)
     res, err := gorethink.Table("user").Insert(&newUser).RunWrite(session)
     if err != nil {
       log.Printf("error: %v\n", err)
@@ -145,7 +144,6 @@ var createUserMutation = relay.MutationWithClientMutationID(relay.MutationConfig
       "id": id,
     })
     tokenString, err := token.SignedString(hmacSecret)
-    log.Println("tokenString: ", tokenString)
     return map[string]interface{}{
       "error": nil,
       "message": "注册成功",
