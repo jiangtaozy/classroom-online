@@ -87,7 +87,7 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
     uid := uuid.NewV4()
     randomNumber := rand.Intn(10000)
     log.Println("randomNumber: ", randomNumber)
-    //log.Println("uid.String(): ", uid.String())
+    log.Println("uid.String(): ", uid.String())
     /*
     // send sms
     respSendSms, err := dysms.SendSms(uid.String(), phone, "母鸡行", "SMS_145594497", `{"code":"1234"}`).DoActionWithException()
