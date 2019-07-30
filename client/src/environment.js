@@ -39,7 +39,8 @@ function fetchQuery(
     }
   }
   return axios.post(
-    'https://192.168.1.106:3001/graphql',
+    //'https://192.168.1.106:3001/graphql',
+    'https://destpact.com/graphql',
     request
   ).then(response => {
     return response.data

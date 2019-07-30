@@ -16,7 +16,8 @@ import (
   "github.com/jiangtaozy/classroom-online/graphql"
 )
 
-var port = flag.String("port", ":3001", "server listening port")
+//var port = flag.String("port", ":3001", "server listening port")
+var port = flag.String("port", ":443", "server listening port")
 
 func main() {
   graphql.Init()
@@ -37,8 +38,9 @@ func main() {
   })
   handler := c.Handler(mux)
   log.Printf("listen at https %s\n", *port)
-  //err := http.ListenAndServeTLS(*port, "/etc/letsencrypt/live/destpact.com/fullchain.pem", "/etc/letsencrypt/live/destpact.com/privkey.pem", handler)
-  err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", handler)
+  //err := http.ListenAndServe(*port, handler)
+  //err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", handler)
+  err := http.ListenAndServeTLS(*port, "/etc/letsencrypt/live/destpact.com/fullchain.pem", "/etc/letsencrypt/live/destpact.com/privkey.pem", handler)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }

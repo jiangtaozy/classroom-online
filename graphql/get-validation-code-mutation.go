@@ -79,7 +79,7 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
       log.Println("验证码已发送过")
       return map[string]interface{}{
         "error": true,
-        "message": "已经发送过验证码了",
+        "message": "已经发送过验证码了，5 分钟后可重新发送",
       }, nil
     }
     dysms.HTTPDebugEnable = true
@@ -90,7 +90,7 @@ var getValidationCodeMutation = relay.MutationWithClientMutationID(relay.Mutatio
     log.Println("uid.String(): ", uid.String())
     /*
     // send sms
-    respSendSms, err := dysms.SendSms(uid.String(), phone, "母鸡行", "SMS_145594497", `{"code":"1234"}`).DoActionWithException()
+    respSendSms, err := dysms.SendSms(uid.String(), phone, "母鸡行", "SMS_145594497", `{"code":"` + strconv.Itoa(randomNumber) + `"}`).DoActionWithException()
     if err != nil {
       log.Println("send sms failed", err, respSendSms.Error())
     }

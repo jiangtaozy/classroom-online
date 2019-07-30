@@ -75,7 +75,7 @@ var getTokenMutation = relay.MutationWithClientMutationID(relay.MutationConfig{
     }
     match, err := ComparePasswordAndHash(password, user.Password)
     if err != nil {
-        log.Fatal(err)
+      log.Println("error: ", err)
     }
     if(!match) {
       return map[string]interface{}{

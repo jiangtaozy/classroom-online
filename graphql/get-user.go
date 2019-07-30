@@ -20,7 +20,11 @@ func GetUser(id string) User {
   var user User
   cursor.One(&user)
   cursor.Close()
-  user.Avatar = uploadFilePath + user.Avatar
-  user.BackgroundImage = uploadFilePath + user.BackgroundImage
+  if(len(user.Avatar) > 0) {
+    user.Avatar = uploadFilePath + user.Avatar
+  }
+  if(len(user.BackgroundImage) > 0) {
+    user.BackgroundImage = uploadFilePath + user.BackgroundImage
+  }
   return user
 }

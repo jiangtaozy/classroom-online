@@ -68,7 +68,7 @@ func Init() {
   if alismsAccessKey, err := ioutil.ReadFile("pem/alismsAccessKey.csv"); err == nil {
     alismsAccessKeyArray := strings.Split(strings.Split(string(alismsAccessKey), "\n")[1], ",")
     alismsAccessKeyId = alismsAccessKeyArray[0]
-    alismsAccessKeySecret = alismsAccessKeyArray[1]
+    alismsAccessKeySecret = strings.Trim(alismsAccessKeyArray[1], "\r")
   } else {
     panic(err)
   }
@@ -142,8 +142,12 @@ func Init() {
           }
           userSlice := make([]interface{}, len(userList))
           for i, user := range userList {
-            user.Avatar = uploadFilePath + user.Avatar
-            user.BackgroundImage = uploadFilePath + user.BackgroundImage
+            if(len(user.Avatar) > 0) {
+              user.Avatar = uploadFilePath + user.Avatar
+            }
+            if(len(user.BackgroundImage) > 0) {
+              user.BackgroundImage = uploadFilePath + user.BackgroundImage
+            }
             userSlice[i] = user
           }
           return relay.ConnectionFromArray(userSlice, args), nil
@@ -292,7 +296,7 @@ func GraphqlHandle(w http.ResponseWriter, r *http.Request) {
     generatedFilename := GenerateUniqueFilename(fileKey + "-", "-" + handler.Filename)
     input[fileKey] = generatedFilename
     delete(input, "fileKey")
-    f, err := os.OpenFile("./public/" + generatedFilename, os.O_WRONLY|os.O_CREATE, 0666)
+    f, err := os.OpenFile("./upload/" + generatedFilename, os.O_WRONLY|os.O_CREATE, 0666)
     if err != nil {
       log.Println("GraphqlHandlerOpenFileError: ", err)
     }

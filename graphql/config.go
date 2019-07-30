@@ -6,5 +6,4 @@
 
 package graphql
 
-var uploadFilePath = "https://192.168.1.106:3001/upload/"
-//var uploadFilePath = "https://destpact.com:3001/upload/"
+var uploadFilePath = "https://destpact.com/upload/"

@@ -77,7 +77,7 @@ class School extends Component {
                   height: 300,
                   objectFit: 'cover',
                 }}
-                src={backgroundImage}
+                src={backgroundImage || '/image/one-piece.jpg'}
                 alt='背景图'
               />
               {/* 头像 */}
@@ -96,7 +96,7 @@ class School extends Component {
                     borderRadius: 5,
                     boxShadow: '-1px -1px 1px 0 white, 1px 1px 1px 0 white',
                   }}
-                  src={avatar}
+                  src={avatar || '/icon/avatar-8a-128.svg'}
                   alt='头像'
                 />
                 <div

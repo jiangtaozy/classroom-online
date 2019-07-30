@@ -25,8 +25,8 @@ class Chatroom extends Component {
       teacherId = id
     }
     // WebSocket
-    let webSocket = new WebSocket(`wss://192.168.1.106:3001/ws?teacherId=${teacherId}`)
-    //let webSocket = new WebSocket("wss://destpact.com:3000/ws")
+    //let webSocket = new WebSocket(`wss://192.168.1.112:3001/ws?teacherId=${teacherId}`)
+    let webSocket = new WebSocket("wss://destpact.com/ws")
     webSocket.onopen = function(event) {
       console.log('websocket open event: ', event)
     }
