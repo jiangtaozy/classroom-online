@@ -8,6 +8,7 @@
 package main
 
 import (
+  "os"
   "log"
   "flag"
   "net/http"
@@ -16,12 +17,13 @@ import (
   "github.com/jiangtaozy/classroom-online/graphql"
 )
 
-//var port = flag.String("port", ":3001", "server listening port")
-var port = flag.String("port", ":443", "server listening port")
 
 func main() {
+  args := os.Args
+  if(len(args) > 1 && args[1] == "development") {
+    os.Setenv("development", "1")
+  }
   graphql.Init()
-  flag.Parse()
   hub := signal.NewHub()
   go hub.Run()
   mux := http.NewServeMux()
@@ -31,16 +33,31 @@ func main() {
     signal.ServeWs(hub, w, r)
   })
   mux.HandleFunc("/graphql", graphql.GraphqlHandle)
-  c := cors.New(cors.Options{
-    AllowedOrigins:   []string{"https://localhost:3000", "https://192.168.1.106:3000"},
-    AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
-    AllowCredentials: true,
-  })
-  handler := c.Handler(mux)
+  developmentENV := os.Getenv("development") == "1"
+  var handler http.Handler
+  var portString string
+  var certPem string
+  var keyPem string
+  if developmentENV {
+    c := cors.New(cors.Options{
+      AllowedOrigins:   []string{"https://localhost:3000", "https://192.168.1.112:3000"},
+      AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+      AllowCredentials: true,
+    })
+    handler = c.Handler(mux)
+    portString = ":3001"
+    certPem = "pem/cert.pem"
+    keyPem = "pem/key.pem"
+  } else {
+    handler = mux
+    portString = ":443"
+    certPem = "/etc/letsencrypt/live/destpact.com/fullchain.pem"
+    keyPem = "/etc/letsencrypt/live/destpact.com/privkey.pem"
+  }
+  var port= flag.String("port", portString, "server listening port")
+  flag.Parse()
   log.Printf("listen at https %s\n", *port)
-  //err := http.ListenAndServe(*port, handler)
-  //err := http.ListenAndServeTLS(*port, "pem/cert.pem", "pem/key.pem", handler)
-  err := http.ListenAndServeTLS(*port, "/etc/letsencrypt/live/destpact.com/fullchain.pem", "/etc/letsencrypt/live/destpact.com/privkey.pem", handler)
+  err := http.ListenAndServeTLS(*port, certPem, keyPem, handler)
   if err != nil {
     log.Fatal("ListenAndServe error: ", err)
   }

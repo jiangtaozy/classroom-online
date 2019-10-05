@@ -141,6 +141,7 @@ func Init() {
             log.Printf("error: %v\n", err)
           }
           userSlice := make([]interface{}, len(userList))
+          uploadFilePath := GetUploadFilePath()
           for i, user := range userList {
             if(len(user.Avatar) > 0) {
               user.Avatar = uploadFilePath + user.Avatar

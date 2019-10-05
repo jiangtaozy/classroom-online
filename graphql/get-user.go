@@ -20,6 +20,7 @@ func GetUser(id string) User {
   var user User
   cursor.One(&user)
   cursor.Close()
+  uploadFilePath := GetUploadFilePath()
   if(len(user.Avatar) > 0) {
     user.Avatar = uploadFilePath + user.Avatar
   }

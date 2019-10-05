@@ -6,4 +6,18 @@
 
 package graphql
 
-var uploadFilePath = "https://destpact.com/upload/"
+import (
+  "os"
+)
+
+var productionUrl = "https://destpact.com"
+var developmentUrl = "https://192.168.1.112:3001"
+
+func GetUploadFilePath() string {
+  developmentENV := os.Getenv("development") == "1"
+  if developmentENV {
+    return developmentUrl + "/upload/"
+  } else {
+    return productionUrl + "/upload/"
+  }
+}
