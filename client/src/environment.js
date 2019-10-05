@@ -11,6 +11,9 @@ import {
   Store,
 } from 'relay-runtime'
 import axios from 'axios'
+import {
+  apiUrl,
+} from './config'
 
 function fetchQuery(
   operation,
@@ -39,8 +42,7 @@ function fetchQuery(
     }
   }
   return axios.post(
-    //'https://192.168.1.106:3001/graphql',
-    'https://destpact.com/graphql',
+    `${apiUrl}/graphql`,
     request
   ).then(response => {
     return response.data
