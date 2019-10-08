@@ -1,14 +1,8 @@
 # Classroom-online
 
-Classroom-online is a online classroom.
+This is an online classroom application.
 
-## todo
+# start
 
-- register
-- login
-- classes
-  - add class
-  - list
-  - detail
-- online class
-- blackboard
+      go run classroom.go development // development
+      go run classroom.go // production
