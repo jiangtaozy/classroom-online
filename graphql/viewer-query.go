@@ -13,6 +13,10 @@ import (
   "github.com/dancannon/gorethink"
 )
 
+type Viewer struct {
+  UserList []User `json:"userList"`
+}
+
 func viewerQuery() *graphql.Field {
   var userConnection = relay.ConnectionDefinitions(relay.ConnectionConfig{
     Name: "UserConnection",

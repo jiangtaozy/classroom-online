@@ -16,6 +16,11 @@ import (
   "github.com/graphql-go/graphql"
 )
 
+type PostData struct {
+  Query string `json:"query"`
+  Variables map[string]interface{} `json:"variables"`
+}
+
 func GraphqlHandle(w http.ResponseWriter, r *http.Request) {
   contentType := r.Header.Get("Content-Type")
   contentTypeKey := strings.Split(contentType, ";")[0]
