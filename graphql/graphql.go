@@ -27,9 +27,7 @@ const (
   requestTimeout = 10 * time.Second
 )
 var userType *graphql.Object
-var viewerType *graphql.Object
 var nodeDefinitions *relay.NodeDefinitions
-var userConnection *relay.GraphQLConnectionDefinitions
 var schema graphql.Schema
 var hmacSecret = []byte("my_secret_key")
 
@@ -112,46 +110,6 @@ func Init() {
       nodeDefinitions.NodeInterface,
     },
   })
-  userConnection = relay.ConnectionDefinitions(relay.ConnectionConfig{
-    Name: "UserConnection",
-    NodeType: userType,
-  })
-  viewerType = graphql.NewObject(graphql.ObjectConfig{
-    Name: "Viewer",
-    Description: "app viewer",
-    Fields: graphql.Fields{
-      "userList": &graphql.Field{
-        Type: userConnection.ConnectionType,
-        Description: "user list",
-        Args: relay.ConnectionArgs,
-        Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-          args := relay.NewConnectionArguments(p.Args)
-          rows, err := gorethink.Table("user").Run(session)
-          if err != nil {
-            log.Printf("error: %v\n", err)
-            return User{}, nil
-          }
-          var userList []User
-          err = rows.All(&userList)
-          if err != nil {
-            log.Printf("error: %v\n", err)
-          }
-          userSlice := make([]interface{}, len(userList))
-          uploadFilePath := GetUploadFilePath()
-          for i, user := range userList {
-            if(len(user.Avatar) > 0) {
-              user.Avatar = uploadFilePath + user.Avatar
-            }
-            if(len(user.BackgroundImage) > 0) {
-              user.BackgroundImage = uploadFilePath + user.BackgroundImage
-            }
-            userSlice[i] = user
-          }
-          return relay.ConnectionFromArray(userSlice, args), nil
-        },
-      },
-    },
-  })
   rootMutation := graphql.NewObject(graphql.ObjectConfig{
     Name: "Mutation",
     Fields: graphql.Fields{
@@ -161,33 +119,28 @@ func Init() {
       "updateUser": updateUserMutation(),
     },
   })
+  userQuery := &graphql.Field{
+    Type: userType,
+    Description: "Get user info",
+    Args: graphql.FieldConfigArgument{
+      "token": &graphql.ArgumentConfig{
+        Type: graphql.String,
+      },
+    },
+    Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+      tokenString, ok := params.Args["token"].(string)
+      if !ok || tokenString == "" {
+        return User{}, nil
+      }
+      id := GetUserIdFromToken(tokenString)
+      return GetUser(id), nil
+    },
+  }
   rootQuery := graphql.NewObject(graphql.ObjectConfig{
     Name: "RootQuery",
     Fields: graphql.Fields{
-      "user": &graphql.Field{
-        Type: userType,
-        Description: "Get user info",
-        Args: graphql.FieldConfigArgument{
-          "token": &graphql.ArgumentConfig{
-            Type: graphql.String,
-          },
-        },
-        Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-          tokenString, ok := params.Args["token"].(string)
-          if !ok || tokenString == "" {
-            return User{}, nil
-          }
-          id := GetUserIdFromToken(tokenString)
-          return GetUser(id), nil
-        },
-      },
-      "viewer": &graphql.Field{
-        Type: viewerType,
-        Description: "app viewer",
-        Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-          return Viewer{}, nil
-        },
-      },
+      "user": userQuery,
+      "viewer": viewerQuery(),
       "node": nodeDefinitions.NodeField,
     },
   })
