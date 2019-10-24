@@ -8,7 +8,6 @@ package graphql
 
 import (
   "log"
-  "time"
   "strings"
   "io/ioutil"
   "github.com/graphql-go/graphql"
