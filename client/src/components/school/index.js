@@ -24,6 +24,10 @@ class School extends Component {
     }
   }
 
+  componentWillUnmount() {
+    window.onscroll = null
+  }
+
   loadMore = () => {
     const {
       hasMore,
@@ -63,7 +67,7 @@ class School extends Component {
           } = node || {}
           return (
             <Link
-              to={`/classroom/${id}`}
+              to={`/space/${id}`}
               key={index}
               style={{
                 display: 'flex',

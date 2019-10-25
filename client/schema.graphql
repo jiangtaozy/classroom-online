@@ -101,7 +101,7 @@ type Mutation {
   query
 """
 type Query {
-  user(token: String): User
+  user(token: String, id: String): User
   node(
     id: ID!
   ): Node

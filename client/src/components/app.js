@@ -4,21 +4,29 @@
  * app
  */
 
-import React, { Component } from 'react'
+import React, {
+  Component,
+} from 'react'
 import {
   BrowserRouter as Router,
   Route,
   Switch,
   Redirect,
 } from 'react-router-dom'
+import {
+  graphql,
+  QueryRenderer,
+} from 'react-relay'
+import {
+  getLastObject,
+} from '../indexedDB'
+import environment from '../environment'
 import Home from './home'
 import About from './about'
 import Register from './register'
 import Login from './login'
 import Chatroom from './chatroom'
-import { getLastObject } from '../indexedDB'
-import environment from '../environment'
-import { graphql, QueryRenderer } from 'react-relay'
+import Space from './space'
 
 class App extends Component {
 
@@ -84,6 +92,18 @@ class App extends Component {
                   render={(routeProps) => {
                     return (
                       <Home
+                        user={user}
+                        token={token}
+                        {...routeProps}
+                      />
+                    )}
+                  }
+                />
+                <Route
+                  path='/space/:id'
+                  render={(routeProps) => {
+                    return (
+                      <Space
                         user={user}
                         token={token}
                         {...routeProps}

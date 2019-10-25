@@ -14,10 +14,12 @@ const navDataArray = [
     title: '主页',
     link: '/school',
   },
+  /*
   {
     title: '课堂',
     link: '/classroom/0',
   },
+  */
   {
     title: '我的',
     link: '/my',

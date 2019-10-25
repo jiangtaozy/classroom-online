@@ -77,14 +77,22 @@ func userQuery() *graphql.Field {
       "token": &graphql.ArgumentConfig{
         Type: graphql.String,
       },
+      "id": &graphql.ArgumentConfig{
+        Type: graphql.String,
+      },
     },
     Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+      id, ok := params.Args["id"].(string)
+      if ok && id != "" {
+        resolvedID := relay.FromGlobalID(id)
+        return GetUser(resolvedID.ID), nil
+      }
       tokenString, ok := params.Args["token"].(string)
       if !ok || tokenString == "" {
         return User{}, nil
       }
-      id := GetUserIdFromToken(tokenString)
-      return GetUser(id), nil
+      userId := GetUserIdFromToken(tokenString)
+      return GetUser(userId), nil
     },
   }
 }
