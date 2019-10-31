@@ -219,6 +219,9 @@ class My extends Component {
               padding: 12,
             }}>
             <Button
+              style={{
+                textAlign: 'left',
+              }}
               onClick={() => this.handleTextClick({
                 textName: 'introduction',
               })}>
