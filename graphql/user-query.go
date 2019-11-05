@@ -20,6 +20,7 @@ type User struct {
   Avatar string `json:"avatar" gorethink:"avatar"`
   Introduction string `json:"introduction" gorethink:"introduction"`
   BackgroundImage string `json:"backgroundImage" gorethink:"backgroundImage"`
+  IsAssistant bool `json:"isAssistant" gorethink:"isAssistant"`
 }
 
 var userType *graphql.Object
@@ -64,6 +65,9 @@ func userQuery() *graphql.Field {
       },
       "backgroundImage": &graphql.Field{
         Type: graphql.String,
+      },
+      "isAssistant": &graphql.Field{
+        Type: graphql.Boolean,
       },
     },
     Interfaces: []*graphql.Interface{

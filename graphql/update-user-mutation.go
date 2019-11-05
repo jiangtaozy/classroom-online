@@ -33,6 +33,9 @@ func updateUserMutation () *graphql.Field {
       "backgroundImage": &graphql.InputObjectFieldConfig{
         Type: graphql.String,
       },
+      "isAssistant": &graphql.InputObjectFieldConfig{
+        Type: graphql.Boolean,
+      },
     },
     OutputFields: graphql.Fields{
       "user": &graphql.Field{
@@ -53,6 +56,7 @@ func updateUserMutation () *graphql.Field {
       avatar := inputMap["avatar"]
       introduction := inputMap["introduction"]
       backgroundImage := inputMap["backgroundImage"]
+      isAssistant := inputMap["isAssistant"]
       user := make(map[string]interface{})
       if nickname != nil {
         user["nickname"] = nickname
@@ -65,6 +69,9 @@ func updateUserMutation () *graphql.Field {
       }
       if backgroundImage != nil {
         user["backgroundImage"] = backgroundImage
+      }
+      if isAssistant != nil {
+        user["isAssistant"] = isAssistant
       }
       updateResponse, err := gorethink.Table("user").Get(id).Update(user).RunWrite(session)
       if err != nil {

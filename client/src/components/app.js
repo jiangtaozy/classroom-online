@@ -66,6 +66,7 @@ class App extends Component {
               nickname,
               introduction,
               backgroundImage,
+              isAssistant,
             },
             viewer {
               ...school_viewer,

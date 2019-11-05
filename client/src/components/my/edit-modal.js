@@ -109,7 +109,7 @@ class EditModal extends Component {
   // on update user error
   onUpdateUserError = (error) => {
     if(error) {
-    console.error('edit-nickname-modal-onUpdateUserError, error: ', error)
+      console.error('edit-nickname-modal-onUpdateUserError, error: ', error)
       this.setState({
         showToast: true,
         toastMessage: error.message,

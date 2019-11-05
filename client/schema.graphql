@@ -9,6 +9,7 @@ type User implements Node {
   avatar: String
   introduction: String
   backgroundImage: String
+  isAssistant: Boolean
 }
 
 type Viewer {
@@ -79,6 +80,7 @@ input UpdateUserInput {
   clientMutationId: String
   fileKey: String
   introduction: String
+  isAssistant: Boolean
 }
 
 type UpdateUserPayload {
