@@ -8,15 +8,12 @@ import React, { Component } from 'react'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogActions from '@material-ui/core/DialogActions'
 import EditModal from './edit-modal'
 import Dropzone from 'react-dropzone'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 import environment from '../../environment'
 import { Link } from 'react-router-dom'
+import AssistantModule from './assistant-module'
 
 class My extends Component {
 
@@ -27,8 +24,6 @@ class My extends Component {
       showToast: false,
       toastMessage: '',
       textName: 'nickname',
-      showBecomeAssistantDialog: false,
-      showCancelAssistantDialog: false,
     }
   }
 
@@ -101,86 +96,12 @@ class My extends Component {
     }
   }
 
-  handleBecomeAssistantDialogOpen = () => {
-    this.setState({
-      showBecomeAssistantDialog: true,
-    })
-  }
-
-  handleBecomeAssistantDialogClose = () => {
-    this.setState({
-      showBecomeAssistantDialog: false,
-    })
-  }
-
-  handleCancelAssistantDialogOpen = () => {
-    this.setState({
-      showCancelAssistantDialog: true,
-    })
-  }
-
-  handleCancelAssistantDialogClose = () => {
-    this.setState({
-      showCancelAssistantDialog: false,
-    })
-  }
-
-  handleBecomeAssistantButtonClick = () => {
-    this.updateUserIsAssistant({
-      isAssistant: true,
-    })
-    this.handleBecomeAssistantDialogClose()
-  }
-
-  handleCancelAssistantButtonClick = () => {
-    this.updateUserIsAssistant({
-      isAssistant: false,
-    })
-    this.handleCancelAssistantDialogClose()
-  }
-
-  updateUserIsAssistant = ({isAssistant}) => {
-    const {
-      user,
-      token,
-    } = this.props
-    const {
-      id,
-    } = user || {}
-    UpdateUserMutation.commit({
-      environment,
-      clientMutationId: id,
-      isAssistant,
-      token,
-      onCompleted: this.onUpdateUserIsAssistantCompleted,
-      onError: this.onUpdateUserIsAssistantError,
-    })
-  }
-
-  onUpdateUserIsAssistantCompleted = (response, errors) => {
-    if(errors) {
-      this.toast(JSON.stringify(errors))
-      console.error('onUpdateUserIsAssistantCompletedErrors: ', errors)
-      return
-    }
-    this.toast('操作成功', 1)
-  }
-
-  onUpdateUserIsAssistantError = (error) => {
-    if(error) {
-      this.toast(JSON.stringify(error))
-      console.error('onUpdateUserIsAssistantError: ', error)
-    }
-  }
-
   render() {
     const {
       showEditModal,
       showToast,
       toastMessage,
       textName,
-      showBecomeAssistantDialog,
-      showCancelAssistantDialog,
     } = this.state
     const {
       user,
@@ -194,7 +115,6 @@ class My extends Component {
       avatar,
       introduction,
       backgroundImage,
-      isAssistant,
     } = user || {}
     return (
       <div
@@ -308,30 +228,10 @@ class My extends Component {
           </Typography>
         }
         {/* 助教 */}
-        {
-          token && (isAssistant ?
-            <div>
-              <Button
-                variant='outlined'
-                style={{
-                  marginLeft: 10,
-                }}
-                onClick={this.handleCancelAssistantDialogOpen}>
-                取消助教
-              </Button>
-            </div>:
-            <div>
-              <Button
-                variant='outlined'
-                style={{
-                  marginLeft: 10,
-                }}
-                onClick={this.handleBecomeAssistantDialogOpen}>
-                成为助教
-              </Button>
-            </div>
-          )
-        }
+        <AssistantModule
+          user={user}
+          token={token}
+        />
         {/* 编辑昵称/简介 Modal */}
         <EditModal
           open={showEditModal}
@@ -340,6 +240,7 @@ class My extends Component {
           token={token}
           textName={textName}
         />
+        {/* Toast */}
         <Dialog
           onClose={this.closeToast}
           open={showToast}>
@@ -349,54 +250,6 @@ class My extends Component {
             }}>
             {toastMessage}
           </div>
-        </Dialog>
-        <Dialog
-          open={showBecomeAssistantDialog}
-          onClose={this.handleBecomeAssistantDialogClose}>
-          <DialogTitle>
-            成为助教老师?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              成为助教老师，通过直播课堂为孩子们解答问题。
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={this.handleBecomeAssistantDialogClose}>
-              取消
-            </Button>
-            <Button
-              color='secondary'
-              autoFocus
-              onClick={this.handleBecomeAssistantButtonClick}>
-              确定
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          open={showCancelAssistantDialog}
-          onClose={this.handleCancelAssistantDialogClose}>
-          <DialogTitle>
-            取消助教老师身份?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              取消助教老师身份，不再进行课堂直播
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={this.handleCancelAssistantDialogClose}>
-              取消
-            </Button>
-            <Button
-              color='secondary'
-              autoFocus
-              onClick={this.handleCancelAssistantButtonClick}>
-              确定
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     )
