@@ -25,7 +25,7 @@ class AssistantFee extends Component {
     this.state = {
       showToast: false,
       toastMessage: '',
-      showDialog: true,
+      showDialog: false,
       editClassFee: classFee,
     }
   }
