@@ -214,7 +214,7 @@ class My extends Component {
           <Typography
             component='p'
             style={{
-              padding: 12,
+              padding: 10,
             }}>
             <Button
               style={{

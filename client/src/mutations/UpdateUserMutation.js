@@ -15,6 +15,7 @@ const mutation = graphql`
         introduction
         backgroundImage
         isAssistant
+        classFee
       }
     }
   }
@@ -24,6 +25,7 @@ const commit = ({
   nickname,
   introduction,
   isAssistant,
+  classFee,
   file,
   fileKey,
   token,
@@ -41,6 +43,7 @@ const commit = ({
           ...(nickname && {nickname}),
           ...(introduction && {introduction}),
           ...((isAssistant !== undefined) && {isAssistant}),
+          ...((classFee !== undefined) && {classFee}),
           ...(fileKey && {fileKey}),
           token,
           clientMutationId,

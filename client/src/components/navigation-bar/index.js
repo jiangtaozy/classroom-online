@@ -47,10 +47,7 @@ class NavigationBar extends Component {
       )
     })
     return (
-      <div
-        style={{
-          height: 40,
-        }}>
+      <div>
         {/* mobile or pad 手机或平板 */}
         <MediaQuery query='(max-device-width: 1224px)'>
           <div style={{
@@ -62,9 +59,15 @@ class NavigationBar extends Component {
             borderTopStyle: 'solid',
             borderTopColor: 'rgba(0, 0, 0, 0.2)',
             borderTopWidth: 1,
+            backgroundColor: 'white',
           }}>
             {navLinkList}
           </div>
+          <div
+            style={{
+              height: 45,
+            }}
+          />
         </MediaQuery>
         {/* pc or laptop 台式电脑或笔记本 */}
         <MediaQuery query='(min-device-width: 1224px)'>
@@ -74,9 +77,18 @@ class NavigationBar extends Component {
             width: '100%',
             display: 'flex',
             justifyContent: 'space-around',
+            borderBottomStyle: 'solid',
+            borderBottomColor: 'rgba(0, 0, 0, 0.2)',
+            borderBottomWidth: 1,
+            backgroundColor: 'white',
           }}>
             {navLinkList}
           </div>
+          <div
+            style={{
+              height: 44,
+            }}
+          />
         </MediaQuery>
       </div>
     )

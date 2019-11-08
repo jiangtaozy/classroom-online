@@ -10,6 +10,7 @@ type User implements Node {
   introduction: String
   backgroundImage: String
   isAssistant: Boolean
+  classFee: Float
 }
 
 type Viewer {
@@ -81,6 +82,7 @@ input UpdateUserInput {
   fileKey: String
   introduction: String
   isAssistant: Boolean
+  classFee: Float
 }
 
 type UpdateUserPayload {

@@ -13,6 +13,7 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import UpdateUserMutation from '../../mutations/UpdateUserMutation'
 import environment from '../../environment'
+import AssistantFee from './assistant-fee'
 
 class AssistantModule extends Component {
 
@@ -131,6 +132,8 @@ class AssistantModule extends Component {
     } = this.props
     const {
       isAssistant,
+      classFee,
+      id,
     } = user || {}
     return (
       <div>
@@ -145,6 +148,11 @@ class AssistantModule extends Component {
                 onClick={this.handleCancelAssistantDialogOpen}>
                 取消助教
               </Button>
+              <AssistantFee
+                classFee={classFee}
+                token={token}
+                userId={id}
+              />
             </div>:
             <div>
               <Button
