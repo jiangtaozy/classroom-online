@@ -45,7 +45,7 @@ func viewerQuery() *graphql.Field {
 
 func userListResolve(p graphql.ResolveParams) (interface{}, error) {
   args := relay.NewConnectionArguments(p.Args)
-  rows, err := gorethink.Table("user").Run(session)
+  rows, err := gorethink.Table("user").Filter(gorethink.Row.Field("isAssistant").Eq(true)).Run(session)
   if err != nil {
     log.Printf("error: %v\n", err)
     return User{}, nil
