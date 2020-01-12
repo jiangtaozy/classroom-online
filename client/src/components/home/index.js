@@ -46,6 +46,19 @@ class Home extends Component {
             )
           }}
         />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: 10,
+          }}>
+          <div
+            style={{
+              fontSize: 15,
+            }}>
+            冀ICP备16025003号
+          </div>
+        </div>
         {/* mobile 导航栏 */}
         <MediaQuery query='(max-device-width: 1224px)'>
           <NavigationBar />
